@@ -1,0 +1,134 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-05 13:42:41
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-10 14:07:21
+ */
+import React, { PureComponent } from 'react';
+import styles from './VideoDetails.less';
+import { connect } from 'dva';
+import img from '../../assets/bg.jpg';
+import share from '../../assets/share.png';
+import ShareModal from '../../components/ShareModal';
+import { Toast, Icon } from 'antd-mobile';
+import router from 'umi/router';
+
+class VideoDetails extends PureComponent {
+  state = {
+    isShare: false,
+  };
+
+  onElseVideoItemClick = item => {
+    Toast.info('点击其他视频中的其中一个', 2);
+    //TODO 重新获取该作者的其他视频列表，当前播放视频变成点击的这个视频
+
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        videoName: item.videoName,
+        lookCount: item.lookCount,
+        src: item.src,
+      },
+    });
+  };
+
+  /**
+   * 获取其他视频
+   */
+  getElseVideoList() {
+    const { videoplayer } = this.props;
+    const { videoList } = videoplayer;
+    const { onElseVideoItemClick } = this;
+    return videoList.map((item, index) => {
+      // const videoSrc = item.src;
+      const videoName = item.videoName;
+      const content = item.content;
+      const key = `list${index}`;
+      return (
+        <div
+          key={key}
+          className={styles.item}
+          onClick={() => {
+            onElseVideoItemClick({ ...item });
+          }}
+        >
+          <div className={styles.imgLayout}>
+            <img className={styles.img} src={img} alt="" />
+          </div>
+          <div className={styles.itemContentLayout}>
+            <span className={styles.videoName}>{videoName}</span>
+            <span className={styles.content}>{content}</span>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  /**
+   * 分享
+   */
+  share = () => {
+    this.setState({
+      isShare: true,
+    });
+  };
+
+  // 取消分享框
+  cancelShareHandler = () => {
+    this.setState({
+      isShare: false,
+    });
+  };
+  back = () => {
+    router.push('./VideoPlayer');
+  };
+
+  render() {
+    const { videoplayer } = this.props;
+    const { lookCount, videoName } = videoplayer;
+    const { isShare } = this.state;
+    const shareModalProps = {
+      isShare,
+      cancelShareHandler: this.cancelShareHandler,
+    };
+    return (
+      <div className={styles.bg}>
+        <Icon type="left" size="sm" color="#fff" className={styles.back} onClick={this.back} />
+        <video
+          className={styles.video}
+          controls
+          preload='auto'
+          src='http://jq22com.qiniudn.com/jq22-sp.mp4'
+          controlsList=" nodownload controlBar "
+        />
+        <div className={styles.detailsLayout}>
+          <div className={styles.detail}>
+            <span className={styles.content}>{videoName}</span>
+            <span className={styles.count}>
+              {lookCount}
+              次播放
+            </span>
+          </div>
+          <div>
+            <img className={styles.share} src={share} alt="" onClick={this.share} />
+          </div>
+        </div>
+        <div className={styles.line} />
+        <div className={styles.elseVideoLayout}>
+          <span width="100%">其他视频</span>
+          <div className={styles.elseVideo}>{this.getElseVideoList()}</div>
+        </div>
+        {isShare && <ShareModal {...shareModalProps} />}
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ videoplayer }) {
+  return {
+    videoplayer,
+  };
+}
+export default connect(mapStateToProps)(VideoDetails);

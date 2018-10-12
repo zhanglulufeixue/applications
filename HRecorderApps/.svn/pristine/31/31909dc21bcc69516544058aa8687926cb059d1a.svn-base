@@ -1,0 +1,108 @@
+import { getVideoList, getOtherVideoList } from '../../service/tourCourse';
+import concat from 'lodash/concat';
+
+export default {
+  namespace: 'tourCourse',
+
+  state: {
+    loading: false,
+    // 巡课列表
+    videoList: [],
+    mobile: 15963257888,
+    page: 0,
+    pageSize: 0,
+    search: '',
+    totalCount: 0,
+    pageCount: 0,
+
+    src: '',
+    deviceName: '',
+    tourId: '',
+    otherVideoList: [],
+    otherPage: 0,
+    otherTotalCount: 0,
+    otherPageSize: 0,
+    otherPageCount: 0,
+    otherLoading: false,
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  effects: {
+    *getVideoList({ payload }, { select, put, call }) {
+      const { mobile, page, pageSize, search, videoList } = yield select(
+        ({ tourCourse }) => tourCourse
+      );
+
+      const query = {
+        mobile,
+        page,
+        pageSize,
+        search,
+      };
+
+      const data = yield call(getVideoList, query);
+      if (data !== null && data !== undefined) {
+        if (data.code === 0) {
+          if (data.result.data[0] !== null && data.result.data[0] !== undefined) {
+            yield put({
+              type: 'changeState',
+              payload: {
+                page: data.result.currentPage,
+                videoList: concat(videoList, data.result.data),
+                totalCount: data.result.count,
+                pageCount: data.result.pageCount,
+              },
+            });
+          }
+        }
+      }
+    },
+
+    *getOtherVideoList({ payload }, { select, put, call }) {
+      const { mobile, otherPage, otherPageSize, tourId, otherVideoList } = yield select(
+        ({ tourCourse }) => tourCourse
+      );
+
+      const query = {
+        mobile,
+        page: otherPage,
+        pageSize: otherPageSize,
+        tourId,
+      };
+
+      const data = yield call(getOtherVideoList, query);
+      if (data !== null && data !== undefined) {
+        if (data.code === 0) {
+          if (data.result.data[0] !== null && data.result.data[0] !== undefined) {
+            yield put({
+              type: 'changeState',
+              payload: {
+                otherPage: data.result.currentPage,
+                otherVideoList: concat(otherVideoList, data.result.data),
+                otherTotalCount: data.result.count,
+                otherPageCount: data.result.pageCount,
+              },
+            });
+          }
+        }
+      }
+    },
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      // eslint-disable-line
+      history.listen(location => {
+        const { pathname } = location;
+        if (pathname === '/tourCourse/tourCourse') {
+          console.log('tourModel', pathname);
+        }
+      });
+    },
+  },
+};

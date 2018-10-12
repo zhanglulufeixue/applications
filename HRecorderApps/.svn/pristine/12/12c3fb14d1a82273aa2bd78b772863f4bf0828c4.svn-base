@@ -1,0 +1,10 @@
+
+function BasicLayout(props) {
+  return (
+    <div>
+      我的直播
+    </div>
+  );
+}
+
+export default BasicLayout;

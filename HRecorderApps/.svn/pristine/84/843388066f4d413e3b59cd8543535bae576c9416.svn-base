@@ -1,0 +1,6 @@
+.tips {
+  margin-top: 50%;
+  text-align: center;
+  color: #108ee9;
+  font-size: 18px;
+}

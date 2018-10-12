@@ -1,0 +1,141 @@
+import React from 'react';
+import { Router as DefaultRouter, Route, Switch } from 'react-router-dom';
+import dynamic from 'umi/dynamic';
+import renderRoutes from 'umi/_renderRoutes';
+
+
+let Router = require('dva/router').routerRedux.ConnectedRouter;
+
+let routes = [
+  {
+    "path": "/",
+    // "component": require('../../layouts/index.js').default,
+    "routes": [
+      {
+        "path": "/",
+        "exact": true,
+        "component": require('../index.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/videoPlayer/videoPlayer",
+        "exact": true,
+        "component": require('../videoPlayer/videoPlayer.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/liveVideo/components/orderModal",
+        "exact": true,
+        "component": require('../liveVideo/components/orderModal.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/liveVideo/components/ParentWatch",
+        "exact": true,
+        "component": require('../liveVideo/components/ParentWatch.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/liveVideo/liveVideo",
+        "exact": true,
+        "component": require('../liveVideo/liveVideo.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/liveVideo/model",
+        "exact": true,
+        "component": require('../liveVideo/model.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/statistics/statistics",
+        "exact": true,
+        "component": require('../statistics/statistics.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/liveVideo/components/orderFailList",
+        "exact": true,
+        "component": require('../liveVideo/components/orderFailList.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/tourCourse/model",
+        "exact": true,
+        "component": require('../tourCourse/model.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/tourCourse/scan",
+        "exact": true,
+        "component": require('../tourCourse/scan.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/tourCourse/tourCourse",
+        "exact": true,
+        "component": require('../tourCourse/tourCourse.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/tourCourse/watchVideo",
+        "exact": true,
+        "component": require('../tourCourse/watchVideo.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/videoPlayer/model",
+        "exact": true,
+        "component": require('../videoPlayer/model.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/videoPlayer/VideoDetails",
+        "exact": true,
+        "component": require('../videoPlayer/VideoDetails.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "path": "/tourCourse/editClassName",
+        "exact": true,
+        "component": require('../tourCourse/editClassName.js').default,
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      },
+      {
+        "component": () => React.createElement(require('D:/2018web/svnNew/HRecorderApps/node_modules/umi-build-dev/lib/plugins/404/NotFound.js').default, { pagesPath: 'src/pages', hasRoutesInConfig: false }),
+        "_title": "HRecorderAPP",
+        "_title_default": "HRecorderAPP"
+      }
+    ],
+    "_title": "HRecorderAPP",
+    "_title_default": "HRecorderAPP"
+  },
+  {
+    "component": () => React.createElement(require('D:/2018web/svnNew/HRecorderApps/node_modules/umi-build-dev/lib/plugins/404/NotFound.js').default, { pagesPath: 'src/pages', hasRoutesInConfig: false }),
+    "_title": "HRecorderAPP",
+    "_title_default": "HRecorderAPP"
+  }
+];
+
+export default function() {
+  return (
+<Router history={window.g_history}>
+      { renderRoutes(routes, {}) }
+    </Router>
+  );
+}

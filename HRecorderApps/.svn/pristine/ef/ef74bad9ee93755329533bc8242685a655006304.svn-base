@@ -1,0 +1,141 @@
+.videoContent {
+    width: 100%;
+    height: 100%;
+
+    :global(.am-list-item) {     
+        border: 1px solid #ccc;
+        border-radius: 28px;
+        min-height: 36px;
+    } 
+    :global(.am-input-item) {     
+        height: 36px;
+    } 
+    :global(.am-navbar-left) {     
+        padding-left: 0px;
+    } 
+    :global(.am-list-item .am-input-control input) {     
+        font-size: 14px;
+    } 
+
+    :global(.am-search) {
+        background-color: transparent;
+        margin: 2% 2% -2% 2%;
+    }
+
+    :global(.am-search-input) {
+        border: 1px solid #fff;
+        border-radius: 28px;
+    }
+
+    :global(.sub-title) {
+       color: #888;
+       font-size: 14px;
+       padding: 30px 0 18px 0;
+    }
+}
+
+.itemContent {
+    width: 88%;
+    // height: 142px;
+    background-color: #fff;
+    margin: 4%;
+    padding: 2%;
+    border-radius: 8px;
+}
+
+.itemTitle {
+    font-size: 16px;
+    margin-bottom: 4%;
+    display: inline-block;
+    margin-top: 2%;
+}
+
+.itemState {
+    float: right;
+    height: 10%;
+    padding: 1% 4%;
+    font-size: 12px;
+    margin-left: 4%;
+    display: inline-block;
+    border-radius: 28px;
+    color: #fff;
+    margin-top: 2%;
+    line-height: 13px;
+}
+
+.itemTeacher {
+    font-size: 14px;
+    margin-bottom: 4%;
+}
+
+.itemDate {
+    font-size: 14px;
+    margin-bottom: 4%;
+}
+
+.itemRoom {
+    font-size: 14px;
+    margin-bottom: 4%;
+}
+
+.line {
+    width: 100%;
+    height: 1px;
+    margin-bottom: 4%;
+    background-color: #e8e8e8;
+}
+
+.itemOperateInfo {
+    clear: both;
+    font-size: 14px;
+    height: 24px;
+}
+
+.itemDelete {
+    float: left;
+    margin-right: 8%;
+}
+
+.itemEdit {
+    float: right;
+    margin-right: 8%;
+}
+
+.itemShare {
+    float: right;
+}
+
+.itemDeleteDisable {
+    float: left;
+    color: #ccc;
+}
+
+.itemEditDisable {
+    float: right;
+    margin-right: 8%;
+    color: #ccc;
+}
+
+.itemShareDisable {
+    float: right;
+    color: #ccc;
+}
+
+.plus {
+    position: fixed;
+    bottom: 10%;
+    right: 10%;
+}
+
+.noData {
+    display: block;
+    width: 100%;
+    margin-top: 55%;
+}
+
+.noDataText {
+    text-align: center;
+    margin-top: 10px;
+    color: #ccc;
+    
+}

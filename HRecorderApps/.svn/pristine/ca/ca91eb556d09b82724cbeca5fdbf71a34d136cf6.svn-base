@@ -1,0 +1,187 @@
+import React, { PureComponent } from 'react';
+import { createForm } from 'rc-form/lib';
+import { connect } from 'dva';
+import { Icon, Toast } from 'antd-mobile';
+import styles from './Details.css';
+import router from 'umi/router';
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
+import 'videojs-flash';
+import noData from '../../assets/no-data.png';
+import InfiniteScroll from 'react-infinite-scroller';
+
+class watchVideo extends PureComponent {
+  componentDidMount() {
+    const { dispatch, tourCourse } = this.props;
+    const { tourId } = tourCourse;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        loading: true,
+        otherVideoList: [],
+        otherPage: 1,
+        otherPageSize: 10,
+        tourId: tourId,
+      },
+    });
+
+    dispatch({
+      type: 'tourCourse/getOtherVideoList',
+    });
+
+    this.player = videojs(
+      'roomVideo',
+      {
+        bigPlayButton: false,
+        textTrackDisplay: false,
+        posterImage: true,
+        errorDisplay: false,
+        controlBar: false,
+      },
+      () => {}
+    );
+    this.player.play();
+  }
+
+  componentWillUnmount() {
+    if (this.player) {
+      this.player.dispose();
+    }
+  }
+
+  /**
+   * 视频列表点击事件
+   */
+  onVideoItemClick = item => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        src: item.computer,
+        deviceName: item.deviceName,
+        tourId: item.tourId,
+        otherVideoList: [],
+        otherPage: 1,
+        otherPageSize: 10,
+      },
+    });
+
+    dispatch({
+      type: 'tourCourse/getOtherVideoList',
+    });
+  };
+
+  back = () => {
+    router.push('/TourCourse');
+  };
+  // 获取镜头列表
+  getTourCourseList = () => {
+    const { tourCourse } = this.props;
+    const { otherVideoList } = tourCourse;
+    const { onVideoItemClick } = this;
+    let isShowLine = true;
+    if (otherVideoList.length === 0) {
+      return;
+    }
+    return otherVideoList.map((item, index) => {
+      if (index === otherVideoList.length - 1) {
+        isShowLine = false;
+      }
+      return (
+        <div
+          key={item.id}
+          onClick={() => {
+            onVideoItemClick({ ...item });
+          }}
+        >
+          <div>
+            <div className={styles.deviceNameLayout}>
+              <div className={styles.deviceName}>{item.deviceName}</div>
+              <div className={styles.goLayout}>
+                <Icon type="right" className={styles.go} />
+              </div>
+              {isShowLine && <div className={styles.line} />}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  };
+
+  onError = () => {
+    Toast.fail('播放失败！', 2);
+  };
+
+  // 加载更多函数
+  loadMore = () => {
+    const { dispatch, tourCourse } = this.props;
+    const { otherPageCount, otherPage } = tourCourse;
+    if (otherPage < otherPageCount) {
+      dispatch({
+        type: 'tourCourse/changeState',
+        payload: {
+          otherPage: otherPage + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'tourCourse/getOtherVideoList',
+      });
+    }
+  };
+
+  render() {
+    const {loadMore} = this;
+    const { tourCourse } = this.props;
+    const { deviceName, otherVideoList, loading, otherPage, otherTotalCount } = tourCourse;
+    const hasMore = otherTotalCount > otherPage;
+    return (
+      <div>
+        <div style={{ width: '100%', fontSize: '12px' }}>
+          <div>
+            <Icon type="left" size="sm" color="#fff" className={styles.back} onClick={this.back} />
+          </div>
+          <div>
+            <video
+              id="roomVideo"
+              width="100%"
+              className="video-js vjs-default-skin vjs- big-play-centered vjs-fluid"
+              z-index="1"
+              onError={this.onError}
+            >
+              <source src="http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8" type="application/x-mpegURL" />
+            </video>
+          </div>
+          <div>
+            <div className={styles.myDeviceName}>{deviceName}</div>
+          </div>
+          <div className={styles.line} />
+          <div className={styles.elseClass}>其他班级</div>
+          {otherVideoList.length === 0 ? (
+            <div className={styles.noDataLayout}>
+              <img className={styles.noDataImg} src={noData} alt="" />
+              <div className={styles.noDataContent}>Opps！暂无视频信息</div>
+            </div>
+          ) : (
+            <InfiniteScroll
+              initialLoad={false}
+              pageStart={0}
+              hasMore={hasMore && loading}
+              loadMore={loadMore}
+            >
+              <div>{this.getTourCourseList()}</div>
+            </InfiniteScroll>
+          )}
+        </div>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ tourCourse }) {
+  return {
+    tourCourse,
+  };
+}
+
+export default connect(mapStateToProps)(createForm()(watchVideo));

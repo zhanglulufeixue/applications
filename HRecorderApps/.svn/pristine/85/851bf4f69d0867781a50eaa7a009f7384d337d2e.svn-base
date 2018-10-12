@@ -1,0 +1,56 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { Button, Icon } from 'antd-mobile';
+import styles from './liveVideo.less';
+
+class LiveVideo extends PureComponent {
+
+  state = {
+    
+  };
+
+  // 获取直播列表
+  getLiveVideoList = () => {
+    const { liveVideo } = this.props;
+    const { liveVideoList } = liveVideo;
+    if (liveVideoList.length === 0) {
+      return;
+    }
+    return liveVideoList.map((item, index) => {
+      return (
+        <div key={item.id} className={styles.itemContent}>
+          <span className={styles.itemTitle}>{item.name}</span>
+          <span className={styles.itemState}>{item.state === '0' ? '正在直播' : item.state === '1' ? '未开始' : '已结束'}</span>
+          <div className={styles.itemTeacher}>{item.teacherName}</div>
+          <div className={styles.itemDate}>{item.date}</div>
+          <div>
+          <div className={styles.itemRoom}>{item.room}</div>
+          <div className={styles.itemOperateInfo}>
+            <Icon className={styles.itemOperate} type='check-circle'></Icon>
+            <Icon className={styles.itemOperate} type='cross'></Icon>
+            <Icon className={styles.itemOperate} type='check'></Icon>
+          </div>
+          </div>
+          
+        </div>
+      );
+    });
+  }
+
+  render() {
+
+    return (
+      <div className={styles.videoContent}>
+        {this.getLiveVideoList()}
+      </div>
+      
+    );
+  }
+}
+function mapStateToProps({ liveVideo }) {
+  return {
+    liveVideo,
+  };
+}
+
+export default connect(mapStateToProps)(LiveVideo);

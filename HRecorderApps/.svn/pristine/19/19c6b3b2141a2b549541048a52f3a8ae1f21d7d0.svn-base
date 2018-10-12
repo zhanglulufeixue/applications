@@ -1,0 +1,49 @@
+  .chartCount {
+    position: absolute;
+    top: 30%;
+    right: 6%;
+    width: 28%;
+  }
+
+  .totleItem {
+    float: left;
+    width: 100%;
+    margin-top: 5vw;
+  }
+
+    .totleNumImg {
+      width: 1vw;
+      height: 1vw;
+      float: left;
+      line-height: 1vw;
+    }
+
+    .totleNumContent {
+      width: 30%;
+      float: left;
+      margin-left: 1vw;
+      font-size: 1vw;
+    }
+    .totleCiNum {
+      width: 30%;
+      float: left;
+      font-size: 1vw;
+      color: blue; 
+    }
+    .ci {
+      width: 30%;
+      float: left;
+      font-size: 1vw;
+    }
+
+  .img {
+  width:100%;
+  height: 50vw;
+  margin-top: 3vw;
+}
+
+.bg {
+  position: relative;
+  height: 50vw;
+  width:100%;
+}

@@ -1,0 +1,282 @@
+.root {
+  height: 80%;
+}
+.noDataLayout {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  .noDataImg {
+    width: 65%;
+    height: 10%;
+    margin-top: 55%;
+  }
+
+  .noDataContent {
+    margin-top: 10px;
+    color: #ccc;
+  }
+}
+
+:global(.am-navbar) {
+  height: 11.73vw;
+}
+
+:global(.am-navbar-light) {
+  color: #333333;
+}
+
+:global(.am-icon-lg){
+  width: 4.8vw;
+  height: 4.8vw;
+}
+
+:global(.am-navbar-light .am-navbar-title) {
+  color: #333333;
+}
+
+:global(.am-navbar-title) {
+  font-size: 4.8vw;
+}
+
+:global(.am-list-item) {     
+  border: 0.13vw solid #ccc;
+  border-radius: 3.73vw;
+  min-height: 10.67vw;
+} 
+
+:global(.am-input-item) {     
+  height: 10.67vw;
+} 
+
+:global(.am-navbar-left) {     
+  padding-left: 0px;
+} 
+
+:global(.am-list-item .am-input-control input) {     
+  font-size: 14px;
+} 
+
+:global(.am-search) {
+  background-color: transparent;
+  margin-top: 3.2vw;
+  margin-right: 2%;
+  margin-bottom: 3.2vw;
+  margin-left: 2%;
+  height: 10.67vw;
+}
+
+:global(.am-search-input) {
+  border-radius: 3.73vw;
+  height: 10.67vw;
+}
+
+:global(.am-search-input .am-search-synthetic-ph-placeholder) {
+  font-size: 3vw;
+}
+
+:global(.am-search-input .am-search-synthetic-ph-icon) {
+  width: 3.2vw;
+  height: 3.2vw;
+  background-size: 3.2vw auto;
+  vertical-align:-0.67vw;
+}
+
+:global(.sub-title) {
+  color: #888;
+  font-size: 14px;
+  padding: 30px 0 18px 0;
+}
+
+:global(.am-search-input .am-search-synthetic-ph) {
+  height: 10.67vw;
+  line-height: 10.67vw;
+  text-align: left;
+  margin-left: 4.67vw;
+}
+
+:global(.am-search-input input[type="search"]) {
+  height: 10.67vw;
+  margin-left: 6vw;
+  font-size: 3vw;
+}
+
+:global(.am-search-input .am-search-clear) {
+  padding-top: 6.67vw;
+  padding-right: 4vw;
+  padding-bottom: 1.33vw;
+  padding-left: 6.5px;
+  width: 3.2vw;
+  height: 3.2vw;
+  background-size: 3.2vw 3.2vw;
+}
+
+:global(.am-search-cancel) {
+  font-size: 3vw;
+}
+
+.titleLayout {
+  width: 100%;
+  height: 3%;
+  background-color: darkblue;
+  padding-top: 5%;
+  padding-bottom: 5%;
+
+  .back {
+    width: 8%;
+    float: left;
+    padding-left: 5%;
+  }
+
+  .title {
+    width: 100%;
+    height: 4.5%;
+    color: aliceblue;
+    font-size: 16px;
+    padding-left: 40%;
+  }
+}
+
+
+.list {
+  clear: both;
+  width: 100%;
+  // height: 100%;
+
+  .itemLayout {
+    width: ~'calc(50% - 4px)';
+    height: 39.62vw;
+    padding: 13px 2px 0px 2px;
+    float: left;
+    position: relative;
+  
+    .videoSrc {
+      width: 100%;
+      height: 27.75vw;
+    }
+
+    .contents {
+      float: left;
+      font-size: 3vw;
+      margin-left: 2%;
+      margin-top: 4.26vw;
+      margin-bottom: 6.4vw;
+    }
+
+    .edit {
+      width: 3vw;
+      height: 3vw;
+      float: right;
+      margin-right: 3vw;
+      margin-top: 4.26vw;
+    }
+  }
+}
+
+.loader {
+  font-size: 3vw;
+  position: fixed;
+  width: 100%;
+  height: 15vw;
+  bottom: 0;
+}
+
+:global(.am-list-item) {
+  position: absolute;
+  margin-left: 2vw;
+  margin-top: 2vw;
+  border: 0; 
+  border-radius: 0;
+  min-height: 0; 
+  background-color: transparent;
+  padding-left: 0;
+}
+:global(.am-list-item.am-list-item-active) {
+  background-color: transparent;
+}
+
+.layout {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.selectAndDeleteLayout {
+  position: fixed;
+  width: 100%;
+  height: 15vw;
+  bottom: 0;
+  line-height: 15vw;
+  background-color: #ffffff;
+
+  .line {
+    float: left;
+    width: 100%;
+    height: 1px;
+    background-color: darkgray;
+  }
+
+  .selectAll {
+    width: 49.5%;
+    height: 15vw;
+    float: left;
+    text-align: center;
+    font-size: 3vw;
+  }
+
+  .lineVertical {
+    margin-top: 3vw;
+    height: 9vw;
+    width: 1px;
+    float: left;
+    background-color: darkgray;
+
+  }
+  .delete {
+    width: 49.5%;
+    height: 15vw;
+    float: right;
+    text-align: center;
+    font-size: 3vw;
+    color: darkgray;
+  }
+  .deleteSelect {
+    width: 49.5%;
+    height: 15vw;
+    float: right;
+    text-align: center;
+    font-size: 3vw;
+    color: red;
+  }
+}
+
+.manager {
+  margin-right: '5%';
+  font-size: 4vw;
+  color: #333333;
+}
+
+.bottomText {
+  text-align: center;
+  color: darkgray;
+  margin: 2% 0;
+}
+
+.uploadBtn {
+  float: right;
+  width: 15%;
+  margin-top: 5.9vw;
+  margin-right: 3%;
+  color: #2798fc;
+  border: 2px solid #2798fc;
+  border-radius: 6px;
+  padding: 1%;
+  text-align: center;
+
+  .uploadText {
+    font-size: 3vw;
+  }
+}
+
+
+

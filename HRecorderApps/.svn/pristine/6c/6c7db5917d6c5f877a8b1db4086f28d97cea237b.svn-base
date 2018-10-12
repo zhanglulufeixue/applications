@@ -1,0 +1,86 @@
+import { Toast } from 'antd-mobile';
+import Icon from '../../assets/yay.jpg';
+
+export default {
+  namespace: 'tourCourse',
+
+  state: {
+    isEdit: false, // 修改直播内容
+    loading: false,
+    total: 0,
+    // 巡课列表
+    tourCourseList: [
+      // {
+      //   id: '1',
+      //   videopic: Icon,
+      //   classroom: '一年一班',
+      //   state: '0',
+      //   teacher: '张三',
+      //   videotype: '教师全景',
+      // },
+      // {
+      //   id: '2',
+      //   videopic: Icon,
+      //   classroom: '一年二班',
+      //   state: '1',
+      //   teacher: '李四',
+      //   videotype: '学生特写',
+      // },
+      // {
+      //   id: '3',
+      //   videopic: Icon,
+      //   classroom: '一年三班',
+      //   state: '2',
+      //   teacher: '王五',
+      //   videotype: '学生全景',
+      // }
+      // {
+      //   id: '4',
+      //   videopic: Icon,
+      //   room: '一年4班',
+      //   state: '3',
+      //   teacher: '赵六',
+      // },
+      // {
+      //   id: '5',
+      //   videopic: Icon,
+      //   room: '一年5班',
+      //   state: '4',
+      //   teacher: '小七',
+      // },
+      // {
+      //   id: '6',
+      //   videopic: Icon,
+      //   room: '一年6班',
+      //   state: '5',
+      //   teacher: '张三1',
+      // },
+    ],
+    id: '',
+    videopic: Icon,
+    classroom: '',
+    state: '0',
+    teacher: '',
+    videotype: '',
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  effects: {},
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      // eslint-disable-line
+      history.listen(location => {
+        const { pathname } = location;
+        if (pathname === '/tourCourse/tourCourse') {
+          console.log('tourModel', pathname);
+        }
+      });
+    },
+  },
+};

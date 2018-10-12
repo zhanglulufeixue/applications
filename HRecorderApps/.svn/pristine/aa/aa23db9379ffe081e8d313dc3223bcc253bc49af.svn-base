@@ -1,0 +1,44 @@
+import request from '../utils/request';
+import { service } from '../utils/config';
+
+export async function getVideoList(params) {
+  return request(`${service.server}frontend/service/video/page-video-list`, {
+    method: 'GET',
+    data: params,
+  });
+}
+
+export async function getElseVideoList(params) {
+  return request(`${service.server}frontend/service/video/page-videos-by-uid`, {
+    method: 'GET',
+    data: params,
+  });
+}
+
+export async function viewCountAdd(params) {
+  return request(`${service.server}frontend/service/video/views-add`, {
+    method: 'GET',
+    data: params,
+  });
+}
+
+export async function savePhoneVideo(params) {
+  return request(`${service.server}frontend/service/video/save-phone-video`, {
+    method: 'POST',
+    data: params,
+  });
+}
+
+export async function getVideoDetails(params) {
+  return request(`${service.server}frontend/service/video/get-video-details`, {
+    method: 'GET',
+    data: params,
+  });
+}
+
+export async function deleteVideo(params) {
+  return request(`${service.server}frontend/service/video/delete-video`, {
+    method: 'GET',
+    data: params,
+  });
+}

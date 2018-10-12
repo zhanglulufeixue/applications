@@ -1,0 +1,16 @@
+import request from '../utils/request';
+import { service } from '../utils/config';
+
+export async function getVideoList(params) {
+  return request(`${service.server}frontend/service/video/page-video-list`, {
+    method: 'GET',
+    data: params,
+  });
+}
+
+export async function getElseVideoList(params) {
+  return request(`${service.server}frontend/service/video/page-videos-by-uid`, {
+    method: 'GET',
+    data: params,
+  });
+}

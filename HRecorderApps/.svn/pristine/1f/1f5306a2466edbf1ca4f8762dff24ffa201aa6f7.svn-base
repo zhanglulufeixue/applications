@@ -1,0 +1,98 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { NavBar ,InputItem, Toast, TextareaItem  } from 'antd-mobile';
+import styles from './UploadVideo.less';
+import router from 'umi/router';
+import { createForm } from 'rc-form';
+
+
+class UploadVideo extends PureComponent {
+
+  state = {
+  };
+
+  componentDidUpdate() {
+    const { form } = this.props;
+    const { getFieldValue } = form;
+    if(getFieldValue('uploadTitle') && getFieldValue('uploadTitle').length > 30) {
+      Toast.info('直播名称最多30个字');
+    }
+  }
+
+  // 取消预约按钮回调
+  cancelHandler = () => {
+    router.push('/videoPlayer/videoPlayer');
+  };
+
+  // 点击预约按钮事件
+  uploadHandler = () => {
+    const { form, dispatch, videoplayer } = this.props;
+    const { validateFields } = form;
+    validateFields((err, value) => {
+      if(err) {
+        Toast.info('请填写完整信息');
+        return;
+      }
+      Toast.info('上传成功');
+      router.push('/videoPlayer/videoPlayer');
+    });
+  };
+
+  render() {
+    const { form, videoplayer} = this.props;
+    const { getFieldProps, getFieldValue } = form;
+    const { } = videoplayer;
+    return (
+      <div>
+       <NavBar
+          key='upload'
+          mode="light"
+          leftContent={[
+            <span key='upload-add1' style={{ marginLeft: '10%' }}onClick={() => {router.push('/videoPlayer/videoPlayer');}}>取消</span>,
+          ]}
+          rightContent={[
+            <span key='upload-add1' onClick={this.uploadHandler} className={styles.uploadBtn}>上传</span>,
+          ]}
+        >
+        </NavBar>
+        <form className={styles.form}>
+          <div className={styles.row}>
+            <span className={styles.leftName}>视频名称:</span>
+            <InputItem {...getFieldProps('uploadTitle', {
+              initialValue: '',
+              rules: [{
+                required: true,
+                message: '请输入视频名称',
+              }
+            ]
+          })} placeholder="请输入视频名称" maxLength={30} ></InputItem>
+          
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>上传教师:</span>
+            <InputItem {...getFieldProps('uploadTeacher', {
+              initialValue: '张老师',
+            })} clear disabled></InputItem>
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>视频简介:</span>
+            <TextareaItem  {...getFieldProps('uploadDescription', {
+              initialValue: '',
+            })} clear placeholder="最多200字" maxLength={200} autoHeight editable></TextareaItem >
+            <div className={styles.line}></div>
+          </div>            
+        </form>
+      </div>
+    
+    );
+  }
+}
+function mapStateToProps({ videoplayer }) {
+  return {
+    videoplayer,
+  };
+}
+
+export default connect(mapStateToProps)(createForm()(UploadVideo));

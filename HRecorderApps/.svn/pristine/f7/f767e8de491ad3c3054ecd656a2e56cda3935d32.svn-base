@@ -1,0 +1,63 @@
+.uploadBtn {
+    color: #2798fc;
+}
+
+.form {
+    background-color: #fff;
+    margin-top: 10px;
+}
+
+.row {
+    clear: both;
+    width: 100%;
+    height: 10%;
+
+    :global(.am-list-item) { 
+        float: right;
+        width: 65%;    
+        border-radius: 2px;
+        padding-left: 2px;
+        min-height: 49px !important;
+        border: none;
+    } 
+    :global(.am-input-item) {     
+        border: none;
+    } 
+    :global(.am-list-item .am-input-control input) {     
+        font-size: 16px;
+        border: none;
+    } 
+    :global(.am-list-line) {     
+        &::after {
+            background-color: transparent!important;
+        }
+    } 
+
+    :global(.am-list-item .am-list-line .am-list-arrow) {     
+        margin-left: 20%;
+    } 
+    :global(.am-list-item .am-list-line .am-list-extra) {     
+        text-align: left;
+        flex-basis: 70%;
+    } 
+}
+
+.line {
+    clear: both;
+    width: 96%;
+    height: 1px;
+    margin: 0 2%;
+    background-color: #e8e8e8;
+}
+
+.leftName {
+    clear: both;
+    float: left;
+    width: 28%;
+    text-align: right;
+    font-size: 16px;
+    line-height: 3;
+    height: 10%;
+    color: #666;
+
+}

@@ -1,0 +1,16 @@
+import request from '../utils/request';
+import { service } from '../utils/config';
+
+export async function getLiveVideoList(params) {
+  return request(`${service.server}frontend/service/video/page-live-video-list`, {
+    method: 'GET',
+    data: params,
+  });
+}
+
+export async function saveLiveRoom(params) {
+  return request(`${service.server}frontend/cloudlive/live/save-live-room`, {
+    method: 'POST',
+    data: params,
+  });
+}

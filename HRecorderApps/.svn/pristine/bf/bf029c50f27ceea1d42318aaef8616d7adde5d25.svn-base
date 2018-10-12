@@ -1,0 +1,87 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import styles from './StatsticsChart.less';
+import img from '../../assets/bg.jpg';
+import ChartCard from '../../components/Statstics/ChartCard';
+import ChartBigScreen from '../../components/Statstics/ChartBigScreen';
+import ChartBoardCast from '../../components/Statstics/ChartBoardCast';
+
+class StatsticsChart extends PureComponent {
+  getList = list => {
+    return list.map((item, index) => {
+      const key = `list${index}`;
+      return (
+        <div key={key} className={styles.listItem}>
+          {index === 0 ? (
+            <div className={styles.orderNumberOne}>{index + 1}</div>
+          ) : index === 1 ? (
+            <div className={styles.orderNumberTwo}>{index + 1}</div>
+          ) : index === 2 ? (
+            <div className={styles.orderNumberThree}>{index + 1}</div>
+          ) : (
+            <div className={styles.orderNumberFour}>{index + 1}</div>
+          )}
+          <span className={styles.name}>{item.name}</span>
+          <span className={styles.num}>
+            {item.num}
+            小时
+          </span>
+        </div>
+      );
+    });
+  };
+
+  render() {
+    const { activityList, useList, toltalCount, openOrClose, type } = this.props;
+    const { getList } = this;
+    const mapChartProps = {
+      openOrClose,
+    };
+    return (
+      <div>
+        <div className={styles.totleDataLayoutItem}>
+          {type === 'bigScreen' ? (
+            <div>
+              <img className={styles.totleNumImg} src={img} alt="" />
+              <div className={styles.totleNumContent}>大屏总数</div>
+            </div>
+          ) : type === 'broadCast' ? (
+            <div>
+              <img className={styles.totleNumImg} src={img} alt="" />
+              <div className={styles.totleNumContent}>录播总数</div>
+            </div>
+          ) : (
+            <div>
+              <img className={styles.totleNumImg} src={img} alt="" />
+              <div className={styles.totleNumContent}>班牌总数</div>
+            </div>
+          )}
+
+          <div className={styles.totleCiNum}>{toltalCount}</div>
+          <div className={styles.ci}>台</div>
+        </div>
+        {type === 'bigScreen' ? (
+          <div>{<ChartBigScreen {...mapChartProps} />}</div>
+        ) : type === 'broadCast' ? (
+            <div>{<ChartBoardCast {...mapChartProps} />}</div>
+        ) : (
+            <div>{<ChartCard {...mapChartProps} />}</div>
+        )}
+        <div className={styles.list}>
+          <div className={styles.card}>
+            <div className={styles.listTitle}>活跃度排行</div>
+            <div className={styles.listLayout}>{getList(activityList)}</div>
+          </div>
+          {type === 'bigScreen' && (
+            <div className={styles.card}>
+              <div className={styles.listTitle}>软件使用排行</div>
+              <div className={styles.listLayout}>{getList(useList)}</div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+}
+
+export default connect()(StatsticsChart);

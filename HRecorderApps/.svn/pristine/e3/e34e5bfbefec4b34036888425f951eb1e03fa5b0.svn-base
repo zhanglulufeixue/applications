@@ -1,0 +1,129 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-04 14:45:48
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-10 13:43:04
+ */
+
+import React, { PureComponent } from 'react';
+import { SearchBar, Toast, NavBar, Icon } from 'antd-mobile';
+import { connect } from 'dva';
+import router from 'umi/router';
+import InfiniteScroll from 'react-infinite-scroller';
+import styles from './videoPlayer.less';
+import img from '../../assets/bg.jpg';
+
+class VideoPlayer extends PureComponent {
+  state = {
+    loading: true,
+  };
+
+  /**
+   * 视频列表点击事件
+   */
+  onVideoItemClick = item => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        videoName: item.videoName,
+        lookCount: item.lookCount,
+        src: item.src,
+      },
+    });
+    router.push('./VideoDetails');
+  };
+
+  /**
+   * 视频列表点击事件
+   */
+  loadMore = () => {
+    const { videoplayer, dispatch } = this.props;
+    const { videoList } = videoplayer;
+    const list = [{ src: { img }, videoName: '这是上拉加载', lookCount: 1000 }];
+    const list1 = videoList.concat(list);
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        videoList: list1,
+      },
+    });
+  };
+
+  /**
+   * 搜索事件
+   */
+  search = value => {
+    Toast.info(value, 2);
+  };
+
+  /**
+   * 获取视频列表
+   */
+  getVideoList() {
+    const { videoplayer } = this.props;
+    const { videoList } = videoplayer;
+    const { onVideoItemClick } = this;
+    return videoList.map((item, index) => {
+      // const videoSrc = item.src;
+      const contents = item.videoName;
+      const key = `list${index}`;
+      return (
+        <div
+          key={key}
+          className={styles.itemLayout}
+          onClick={() => {
+            onVideoItemClick({ ...item });
+          }}
+        >
+          <div className={styles.item}>
+            <img className={styles.img} src={img} alt="" />
+            <span className={styles.content}>{contents}</span>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  /**
+   * 返回到主页
+   */
+  back = () => {
+    router.push('./VideoDetails');
+  };
+
+  render() {
+    const { loadMore } = this;
+    const { loading } = this.state;
+    return (
+      <div className={styles.bg}>
+        <NavBar
+          mode="dark"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={() => {
+            router.push('/');
+          }}
+        >
+          我的视频
+        </NavBar>
+        <SearchBar placeholder="请输入视频名称" onSubmit={val => this.search(val)} />
+        <div className={styles.list}>
+          <div className={styles.ItemBg}>
+            <InfiniteScroll initialLoad={false} pageStart={0} hasMore={loading} loadMore={loadMore}>
+              <div>{this.getVideoList()}</div>
+            </InfiniteScroll>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ videoplayer }) {
+  return {
+    videoplayer,
+  };
+}
+
+export default connect(mapStateToProps)(VideoPlayer);

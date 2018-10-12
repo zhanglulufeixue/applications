@@ -1,0 +1,72 @@
+import { getVideoList } from '../../service/tourCourse';
+import concat from 'lodash/concat';
+
+export default {
+  namespace: 'tourCourse',
+
+  state: {
+    loading: false,
+    // 巡课列表
+    videoList: [],
+    mobile: 15963257888,
+    page: 0,
+    pageSize: 0,
+    search: '',
+    totalCount: 0,
+    pageCount: 0,
+
+    src: '',
+    deviceName:'',
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  effects: {
+    *getVideoList({ payload }, { select, put, call }) {
+      const { mobile, page, pageSize, search, videoList } = yield select(
+        ({ tourCourse }) => tourCourse
+      );
+
+      const query = {
+        mobile,
+        page,
+        pageSize,
+        search,
+      };
+
+      const data = yield call(getVideoList, query);
+      if (data !== null && data !== undefined) {
+        if (data.code === 0) {
+          if (data.result.data[0] !== null && data.result.data[0] !== undefined) {
+            yield put({
+              type: 'changeState',
+              payload: {
+                page: data.result.currentPage,
+                videoList: concat(videoList, data.result.data),
+                totalCount: data.result.count,
+                pageCount: data.result.pageCount,
+              },
+            });
+          }
+        }
+        console.log('videoList.size', videoList);
+      }
+    },
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      // eslint-disable-line
+      history.listen(location => {
+        const { pathname } = location;
+        if (pathname === '/tourCourse/tourCourse') {
+          console.log('tourModel', pathname);
+        }
+      });
+    },
+  },
+};

@@ -1,0 +1,41 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-04 14:02:17
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-05 13:16:24
+ */
+
+import React, { PureComponent } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import styles from './VideoList.less';
+import VideoItem from './VideoItem';
+
+export default class VideoList extends PureComponent {
+  getVideoList() {
+    const { videoList, onVideoItemClick } = this.props;
+    console.log('videoList', videoList);
+    return videoList.map((item, index) => {
+      const videoSrc = item.src;
+      console.log('src', videoSrc);
+      const contents = item.content;
+      const key = `list${index}`;
+      return (
+        <div key={key} className={styles.item}>
+          <VideoItem onVideoItemClick={onVideoItemClick} videoSrc={videoSrc} contents={contents} />
+        </div>
+      );
+    });
+  }
+  render() {
+    const { loadMore, loading } = this.props;
+    console.log('loading', loading);
+    return (
+      <div className={styles.bg}>
+        <InfiniteScroll initialLoad={false} pageStart={0} hasMore={loading} loadMore={loadMore}>
+          <div>{this.getVideoList()}</div>
+        </InfiniteScroll>
+      </div>
+    );
+  }
+}

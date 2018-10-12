@@ -1,0 +1,111 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-05 13:42:41
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-06 09:19:15
+ */
+import React, { PureComponent } from 'react';
+import styles from './VideoDetails.less';
+import { connect } from 'dva';
+import img from '../../assets/yay.jpg';
+import share from '../../assets/share.png';
+import ShareModal from '../../components/ShareModal'
+
+class VideoDetails extends PureComponent {
+
+  state = {
+    isShare:false,
+  }
+
+  /**
+   * 获取其他视频
+   */
+  getElseVideoList() {
+    const { videoplayer } = this.props;
+    const { videoList } = videoplayer;
+    return videoList.map((item, index) => {
+      // const videoSrc = item.src;
+      const videoName = item.videoName;
+      const content = item.content;
+      const key = `list${index}`;
+      return (
+        <div
+          key={key}
+          className={styles.item}
+          onClick={() => {
+            // onVideoItemClick({ ...item });
+          }}
+        >
+          <div className={styles.imgLayout}>
+            <img className={styles.img} src={img} alt="" />
+          </div>
+          <div>
+            <span className={styles.videoName}>{videoName}</span>
+            <span className={styles.content}>{content}</span>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  /**
+   * 分享
+   */
+  share = () => {
+    console.log('分享', '分享');
+    this.setState({
+      isShare: true,
+    });
+  };
+
+  // 取消分享框
+  cancelShareHandler = () => {
+    this.setState({
+      isShare: false,
+    });
+  };
+
+  render() {
+    const { videoplayer } = this.props;
+    const { lookCount, videoName } = videoplayer;
+    const {isShare} = this.state;
+    const shareModalProps = {
+      isShare,
+      cancelShareHandler: this.cancelShareHandler,
+    };
+    return (
+      <div className={styles.bg}>
+        <video className={styles.video} controls />
+        <div className={styles.detailsLayout}>
+          <div className={styles.detail}>
+            <span className={styles.content}>{videoName}</span>
+            <br />
+            <span className={styles.count}>
+              {lookCount}
+              次播放
+            </span>
+          </div>
+          <div>
+            <img className={styles.share} src={share} alt="" onClick={this.share} />
+          </div>
+        </div>
+        <div className={styles.line} />
+        <div className={styles.elseVideoLayout}>
+          <span width="100%">其他视频</span>
+          <div className={styles.elseVideo}>
+            {this.getElseVideoList()}
+          </div>
+        </div>
+        {isShare && <ShareModal {...shareModalProps} />}
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ videoplayer }) {
+  return {
+    videoplayer,
+  };
+}
+export default connect(mapStateToProps)(VideoDetails);

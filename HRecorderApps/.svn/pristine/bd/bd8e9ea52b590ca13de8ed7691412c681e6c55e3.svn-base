@@ -1,0 +1,32 @@
+.shareContent {
+    width: 100%;
+    bottom: 0px;
+}
+
+.iconInfo {
+    float: left;
+    width: 16%;
+    height: 26%;
+    margin: 4%;
+    &:hover{
+        background-color: rgb(37, 78, 192);
+    }
+}
+
+:global(.am-modal-mask) {
+    top: auto;
+    height: 20%;
+    background-color: #669cc3;
+}
+:global(.am-modal-transparent) {
+    width: 100%;
+}
+:global(.am-modal) {
+    position: fixed;
+    top: auto;
+    bottom: 0px;
+    height: 20%;
+}
+:global(.am-modal-content) {
+    background-color: transparent;
+}

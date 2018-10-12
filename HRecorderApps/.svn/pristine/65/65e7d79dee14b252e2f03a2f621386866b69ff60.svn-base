@@ -1,0 +1,48 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import styles from './ShareVideo.less';
+import router from 'umi/router';
+import { Icon } from 'antd-mobile';
+
+let player = null;
+class ShareWatch extends PureComponent {
+  componentDidMount() {
+    const fileID = '5285890782010672365';
+    const appID = '1257645122';
+    const options = {
+      fileID: fileID, // 请传入需要播放的视频 filID 必须
+      appID: appID, // 请传入点播账号的 appID 必须
+      // plugins: {
+      //   ContinuePlay: {
+      //     // 开启续播功能
+      //     // auto: true, //[可选] 是否在视频播放后自动续播
+      //     // text:'上次播放至 ', //[可选] 提示文案
+      //     // btnText: '恢复播放' //[可选] 按钮文案
+      //   },
+      // },
+    };
+    player = window.TCPlayer('shareVideo', options);
+    setTimeout(() => {
+      player.play();
+    }, 2000);
+  }
+
+  back = () => {
+    player.pause();
+    // player.dispose();
+    console.log('player+++++++++back', player);
+
+    router.push('./Details');
+  };
+
+  render() {
+    return (
+      <div className={styles.bg}>
+        <Icon type="left" size="m" color="#fff" onClick={this.back} />
+        <video className={styles.video} id="shareVideo" />
+      </div>
+    );
+  }
+}
+
+export default connect()(ShareWatch);

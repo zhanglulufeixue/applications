@@ -1,0 +1,90 @@
+
+.back {
+  position: fixed;
+  top: 5%;
+  z-index: 10;
+}
+
+.line {
+  width: 90%;
+  height: 1px;
+  background-color: #E8E8E8;
+  margin-left: 5%;
+  float: left;
+}
+
+.myDeviceName {
+  margin: 5%;
+  font-size: 4.8vw;
+  color: #333333;
+}
+
+.elseClass {
+  margin-left: 5%;
+  width: 95%;
+  margin-top: 5.3vw;
+  margin-bottom: 2.4vw;
+  font-size: 4vw;
+  float: left;
+  color: #333333;
+}
+
+.deviceNameLayout {
+  width: 100%;
+  height: 16.27vw;
+  font-size: 16px;
+}
+.deviceListLayout {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 10px;
+  margin-top: 13px;
+}
+
+.deviceName {
+  float: left;
+  width: 85%;
+  height: 16.27vw;
+  line-height: 16.27vw;
+  font-size: 4vw;
+  margin-left: 5%;
+  color: #333333;
+}
+
+.goLayout {
+  float: left;
+  width: 10%;
+  height: 16.27vw;  
+}
+.go {
+  width: 55%;
+  height: 30px;
+  margin-top: 4vw;
+  color: #888;
+}
+.line {
+  width: 90%;
+  height: 1px;
+  background-color: #EAEAEA;
+  margin-left: 5%;
+  margin-right: 5%;
+  float: left;
+}
+
+.nodataLayout {
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+.nodateImg {
+  width: 65%;
+  height: 10%;
+  margin-top: 30%;
+}
+
+.nodataContent {
+  margin-top: 10px;
+  color: #ccc;
+}
+
+

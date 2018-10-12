@@ -1,0 +1,125 @@
+
+import { Toast } from 'antd-mobile';
+import router from 'umi/router';
+import { getLiveVideoList, saveLiveRoom, deleteLive } from '../../service/liveVideo';
+
+export default {
+
+  namespace: 'liveVideo',
+
+  state: {
+    orderOrEdit: '',  // 0-预约直播  1-修改直播内容 
+    // 直播列表
+    liveVideoList: [],
+    liveListTotal: 0,
+    livePage: 1,
+    livePageSize: 6,
+    loading: false,
+    isShare: false,  // 是否点击分享
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  effects: {
+    // 获取直播列表
+    *getLiveVideoList({ payload }, { select, put, call}) {
+      const { livePage, livePageSize } = yield select(({ liveVideo }) => liveVideo);
+      const query = {
+        page: (payload && payload.page || livePage),
+        pageSize: (payload && payload.pageSize) || livePageSize,
+        userPhone: (payload && payload.userPhone || ''),
+        keyword: (payload && payload.keyword) || '',
+      };
+      const data = yield call(getLiveVideoList, query);
+      if(data.code === 0 && data.result) {
+        Toast.info('获取直播列表成功');
+        yield put({
+          type: 'changeState',
+          payload: {
+            liveVideoList: data.result.data,
+            liveListTotal: data.result.count,
+          },
+        });
+      } else {
+        Toast.info('获取直播列表失败');
+      }
+    },
+
+    // 预约直播
+    *saveLiveRoom({ payload }, { select, put, call}) {
+      const query = {
+        title: payload && payload.title,
+        userPhone: (payload && payload.userPhone) || '111',
+        deviceCode: (payload && payload.deviceCode) || '222',
+        userName: (payload && payload.userName) || '',
+        startTime: payload && payload.startTime,
+        endTime: payload && payload.endTime,
+        schoolName: (payload && payload.schoolName) || '333',
+      };
+      const data = yield call(saveLiveRoom, query);
+      if(data.code === 0 && data.result) {
+        Toast.info('预约成功');
+        yield put({
+          type: 'getLiveVideoList',
+          payload: {
+            page: 1,
+            pageSize: 6,
+            userPhone: '',
+            keyword: '',
+          },
+        });
+        router.push('/liveVideo/liveVideo');
+      } else {
+        Toast.info('预约失败');
+        router.push('/liveVideo/components/orderFailList');
+      }
+    },
+
+    // 删除直播
+    *deleteLive({ payload }, { select, put, call}) {
+      const query = {
+        liveId: payload && payload.liveId,
+        serviceLiveId: '',
+      };
+      const data = yield call(deleteLive, query);
+      if(data.code === 0 && data.result) {
+        yield put({
+          type: 'getLiveVideoList',
+          payload: {
+            page: 1,
+            pageSize: 6,
+            userPhone: '',
+            keyword: '',
+          },
+        });
+        Toast.info('删除成功');
+      } else {
+        Toast.info('删除失败');
+      }
+    }
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {  // eslint-disable-line     
+      history.listen((location) => {
+        const { pathname } = location;
+        if (pathname === '/liveVideo/liveVideo') {
+          dispatch({
+            type: 'getLiveVideoList',
+            payload: {
+              page: 1,
+              pageSize: 6,
+              userPhone: '',
+              keyword: '',
+            },
+          });
+        }
+      });
+    },
+  },
+
+};

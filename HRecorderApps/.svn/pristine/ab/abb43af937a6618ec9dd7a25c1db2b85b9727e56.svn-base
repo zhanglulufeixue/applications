@@ -1,0 +1,26 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import close from '../../assets/close.png';
+import styles from './ShareVideo.less';
+
+class ShareWatch extends PureComponent {
+
+  close = () => {
+    console.log('关闭','关闭');
+  }
+  render() {
+    return (
+      <div className={styles.bg}>
+        <video
+          className={styles.video}
+          controls
+          preload="auto"
+          src="http://192.168.16.17:33281/66/2018-09-03_13-12-44/2040292385/2040292385.mp4"
+          controlsList=" nodownload controlBar "
+        />
+      </div>
+    );
+  }
+}
+
+export default connect()(ShareWatch);

@@ -1,0 +1,128 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-11 10:03:01
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-10-09 14:05:46
+ */
+import { getVideoList, getElseVideoList, viewCountAdd } from '../../service/videoPlayer';
+import concat from 'lodash/concat';
+
+export default {
+  namespace: 'videoPlayer',
+
+  state: {
+    videoName: '',
+    src: '',
+    uploadTime:'',
+    description:'',
+
+    videoList: [],
+    page: 0,
+    pageSize: 0,
+    search: '',
+    userMobile: 15963257888,
+    id: '',
+    totalCount: 0,
+    pageCount: 0,
+    loading: false,
+
+    elseVideoList: [],
+    elsePage: 0,
+    elsePageSize: 0,
+    elseTotalCount: 0,
+    elsePageCount: 0,
+    elseLoading: false,
+    viewCount: 0,
+    deleteList: [],
+    idList: [],
+
+    editItem: null, //编辑时的item
+
+    uploadFile: '',
+  },
+
+  effects: {
+    *getVideoList({ payload }, { call, put, select }) {
+      const { page, pageSize, userMobile, search, videoList } = yield select(
+        ({ videoPlayer }) => videoPlayer
+      );
+      const query = {
+        page,
+        pageSize,
+        userMobile,
+        search,
+      };
+      const data = yield call(getVideoList, query);
+      if (data !== null && data !== undefined) {
+        if (data.code === 0) {
+          if (data.result.data[0] !== null && data.result.data[0] !== undefined) {
+            yield put({
+              type: 'changeState',
+              payload: {
+                uId: data.result.data[0].uId,
+                age: data.result.currentPage,
+                videoList: concat(videoList, data.result.data),
+                totalCount: data.result.count,
+                pageCount: data.result.pageCount,
+              },
+            });
+          }
+        }
+      }
+    },
+
+    *getElseVideoList({ payload }, { call, put, select }) {
+      const { elsePage, elsePageSize, userMobile, elseVideoList, id } = yield select(
+        ({ videoPlayer }) => videoPlayer
+      );
+      const query = {
+        page: elsePage,
+        pageSize: elsePageSize,
+        userMobile,
+        id: id,
+      };
+
+      const data = yield call(getElseVideoList, query);
+      if (data.code === 0) {
+        yield put({
+          type: 'changeState',
+          payload: {
+            elsePage: data.result.currentPage,
+            elseVideoList: concat(elseVideoList, data.result.data),
+            elseTotalCount: data.result.count,
+            elsePageCount: data.result.pageCount,
+          },
+        });
+      }
+    },
+
+    *viewCountAdd({ payload }, { call, select, put }) {
+      const { id } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        id,
+      };
+      const data = yield call(viewCountAdd, query);
+      if (data.code === 0) {
+        yield put({
+          type: 'changeState',
+          payload: {
+            viewCount: data.result,
+          },
+        });
+      }
+    },
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      // eslint-disable-line
+    },
+  },
+};

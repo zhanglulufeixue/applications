@@ -1,0 +1,248 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-11 10:03:01
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-10-11 17:48:24
+ */
+import {
+  getVideoList,
+  getElseVideoList,
+  viewCountAdd,
+  getVideoDetails,
+  savePhoneVideo,
+  updateVideo,
+  deleteVideo,
+} from '../../service/videoPlayer';
+import concat from 'lodash/concat';
+import { Toast } from 'antd-mobile';
+import router from 'umi/router';
+
+export default {
+  namespace: 'videoPlayer',
+
+  state: {
+    videoName: '',
+    uploadTime: '',
+    description: '',
+
+    videoList: [],
+    pageSize: 10,
+    page:0,
+    userMobile: 15963257888,
+    pageCount: 0,
+
+    elseVideoList: [],
+    elsePageSize: 5,
+    elsePage: 1,
+    viewCount: 0,
+
+    editItem: null, //编辑时的item
+
+    uploadFile: '',
+  },
+
+  effects: {
+    *getVideoList({ payload }, { call, put, select }) {
+      const { pageSize, userMobile, videoList,page } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        page: page,
+        pageSize,
+        userMobile,
+        search: payload && payload.search,
+      };
+      const data = yield call(getVideoList, query);
+      if (data !== null && data !== undefined) {
+        if (data.code === 0) {
+          if (data.result.data[0] !== null && data.result.data[0] !== undefined) {
+            yield put({
+              type: 'changeState',
+              payload: {
+                page: data.result.currentPage,
+                videoList: concat(videoList, data.result.data),
+                pageCount: data.result.pageCount,
+              },
+            });
+          }
+        }
+      }
+    },
+
+    *getVideoDetails({ payload }, { call, put, select }) {
+      const { userMobile } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        videoId: payload && payload.videoId,
+        userMobile,
+      };
+      const data = yield call(getVideoDetails, query);
+      if (data !== null && data !== undefined) {
+        if (data.code === 0) {
+          if (data.result !== null && data.result !== undefined) {
+            yield put({
+              type: 'changeState',
+              payload: {
+                uploadTime: data.result.uploadTime,
+                description: data.result.description,
+                videoName: data.result.videoTitle,
+              },
+            });
+          }
+        }
+      }
+    },
+
+    *getElseVideoList({ payload }, { call, put, select }) {
+      const { userMobile, elsePage, elsePageSize } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        page: elsePage,
+        pageSize: elsePageSize,
+        userMobile,
+        videoId: payload && payload.videoId,
+      };
+
+      const data = yield call(getElseVideoList, query);
+      if (data.code === 0) {
+        yield put({
+          type: 'changeState',
+          payload: {
+            elseVideoList: data.result.data,
+          },
+        });
+      }
+    },
+
+    *viewCountAdd({ payload }, { call, select, put }) {
+      const { userMobile } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        videoId: payload && payload.videoId,
+        userMobile,
+      };
+      const data = yield call(viewCountAdd, query);
+      if (data.code === 0) {
+        yield put({
+          type: 'changeState',
+          payload: {
+            viewCount: data.result,
+          },
+        });
+      }
+    },
+
+    // 添加视频上传入库
+    *savePhoneVideo({ payload }, { call, select, put }) {
+      const { userName, userMobile } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        fileId: payload.fileId,
+        videoUrl: payload.videoUrl,
+        videoName: payload.videoName,
+        description: payload.description,
+        userName: userName || '',
+        mobile: userMobile || '',
+      };
+      const data = yield call(savePhoneVideo, query);
+      if (data.result) {
+        Toast.hide();
+        Toast.info('上传成功');
+      }
+    },
+
+    // 修改视频信息
+    *updateVideo({ payload }, { call, select, put }) {
+      const { userMobile } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        videoId: payload.videoId,
+        videoName: payload.videoName,
+        description: payload.description,
+        userMobile,
+      };
+      const data = yield call(updateVideo, query);
+      if (data.result) {
+        Toast.hide();
+        Toast.info('修改成功');
+        router.push('/Videos');
+      }
+    },
+
+    // 删除视频
+    *deleteVideo({ payload }, { call, select, put }) {
+      const { userMobile } = yield select(({ videoPlayer }) => videoPlayer);
+      const query = {
+        videoIds: payload && payload.ids,
+        userMobile,
+      };
+      const data = yield call(deleteVideo, query);
+      if (data.code === 0) {
+        if (data.result !== null && data.result !== undefined) {
+          if (data.result === true) {
+            yield put({
+              type: 'changeState',
+              payload: {
+                videoList: [],
+              },
+            });
+            yield put({
+              type: 'getVideoList',
+              payload: {
+                page: 1,
+                search: '',
+              },
+            });
+            if (payload && payload.callback) {
+              payload.callback();
+            }
+          }
+        }
+      }
+    },
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      history.listen(location => {
+        const { pathname, query } = location;
+        const { videoId, userMobile } = query;
+        if (pathname === '/Videos/Details.html') {
+          dispatch({
+            type: 'changeState',
+            payload: {
+              viewCount: 0,
+            },
+          });
+          dispatch({
+            type: 'getVideoDetails',
+            payload: {
+              videoId: videoId,
+            },
+          });
+
+          dispatch({
+            type: 'getElseVideoList',
+            payload: {
+              videoId: videoId,
+            },
+          });
+
+          dispatch({
+            type: 'viewCountAdd',
+            payload: {
+              videoId: videoId,
+            },
+          });
+        } else if (pathname === '/Videos') {
+          dispatch({
+            type: 'changeState',
+            payload: {
+              userMobile: userMobile,
+            },
+          });
+        }
+      });
+    },
+  },
+};

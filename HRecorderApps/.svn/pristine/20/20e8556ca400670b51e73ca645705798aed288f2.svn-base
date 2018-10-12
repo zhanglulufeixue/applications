@@ -1,0 +1,148 @@
+// /*
+//  * @Author: syy
+//  * @Date: 2018-09-05 14:47:40
+//  * @Description: 描述
+//  * @Last Modified by: syy
+//  * @Last Modified time: 2018-09-10 15:43:34
+//  */
+
+// import img from '../../assets/yay.jpg';
+
+// export default {
+//   namespace: 'videoplayer',
+
+//   state: {
+//     videoList: [
+//       // {
+//       //   src: { img },
+//       //   videoName:
+//       //     '论读书的重要性',
+//       //   lookCount: 888888,
+//       //   content: '论读书的重要性',
+//       // },
+//       // {
+//       //   src: { img },
+//       //   videoName: '你想对说句什么',
+//       //   lookCount: 666666,
+//       //   content: '再看一眼',
+//       // },
+//     ],
+//     content: '',
+//     lookCount: 0,
+//     src: '',
+//   },
+
+//   reducers: {
+//     changeState(state, action) {
+//       return { ...state, ...action.payload };
+//     },
+//   },
+
+//   effects: {},
+
+//   subscriptions: {
+//     setup({ dispatch, history }) {},
+//   },
+// };
+/*
+ * @Author: syy
+ * @Date: 2018-09-11 10:03:01
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-11 16:04:47
+ */
+import { getVideoList, getElseVideoList } from '../../service/videoPlayer';
+import concat from 'lodash/concat';
+
+export default {
+  namespace: 'videoplayer',
+
+  state: {
+    videoName:'',
+    lookCount:'',
+    src:'',
+
+    videoList: [],
+    page: 0,
+    pageSize: 0,
+    search: '',
+    userMobile: 15963257888,
+    id:"",
+    totalCount: 0,
+    pageCount: 0,
+    loading: false,
+
+    elseVideoList: [],
+    elsePage: 0,
+    elsePageSize: 0,
+    elseTotalCount: 0,
+    elsePageCount: 0,
+    elseLoading: false,
+  },
+
+  effects: {
+    *getVideoList({ payload }, { call, put, select }) {
+      const { page, pageSize, userMobile, search, videoList } = yield select(
+        ({ videoplayer }) => videoplayer
+      );
+      const query = {
+        page,
+        pageSize,
+        userMobile,
+        search,
+      };
+      const data = yield call(getVideoList, query);
+      if (data !== null && data !== undefined) {
+        if (data.code === 0) {
+          yield put({
+            type: 'changeState',
+            payload: {
+              page: data.result.currentPage,
+              videoList: concat(videoList, data.result.data),
+              totalCount: data.result.count,
+              pageCount: data.result.pageCount,
+              uId:data.result.data[0].uId,
+            },
+          });
+        }
+      }
+    },
+
+    *getElseVideoList({ payload }, { call, put, select }) {
+      const { elsePage, elsePageSize, userMobile, elseVideoList,id } = yield select(
+        ({ videoplayer }) => videoplayer
+      );
+      const query = {
+        page:elsePage,
+        pageSize:elsePageSize,
+        userMobile,
+        id:id,
+      };
+
+      const data = yield call(getElseVideoList, query);
+      if (data.code === 0) {
+        yield put({
+          type: 'changeState',
+          payload: {
+            elsePage: data.result.currentPage,
+            elseVideoList: concat(elseVideoList, data.result.data),
+            elseTotalCount: data.result.count,
+            elsePageCount: data.result.pageCount,
+          },
+        });
+      }
+    },
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+      // eslint-disable-line
+    },
+  },
+};

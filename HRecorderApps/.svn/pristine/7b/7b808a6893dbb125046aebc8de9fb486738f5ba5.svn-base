@@ -1,0 +1,51 @@
+/**
+ * 分享底部弹窗组件
+ * 
+ */
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { Button, Modal, Toast } from 'antd-mobile';
+import styles from './ShareModal.less';
+import router from 'umi/router';
+import { createForm } from 'rc-form';
+import shareIcon from '../assets/yay.jpg';
+
+class orderModal extends PureComponent {
+
+  state = {
+    
+  };
+
+  cancelHandler = () => {
+    router.push('/liveVideo/liveVideo');
+  };
+
+  shareHandler = () => {
+    Toast.info('分享成功');
+  };
+
+  render() {
+    const { isShare, cancelShareHandler} = this.props;
+
+    return (
+      <Modal
+          transparent
+          visible={isShare}
+          onClose={cancelShareHandler}
+      >
+        <div className={styles.shareContent}>
+          <img className={styles.iconInfo} onClick={this.shareHandler} src={shareIcon} alt=''/>
+          <img className={styles.iconInfo} onClick={this.shareHandler} src={shareIcon} alt=''/>
+          <img className={styles.iconInfo} onClick={this.shareHandler} src={shareIcon} alt=''/>
+        </div>
+      </Modal>
+    );
+  }
+}
+function mapStateToProps({ liveVideo }) {
+  return {
+    liveVideo,
+  };
+}
+
+export default connect(mapStateToProps)(createForm()(orderModal));

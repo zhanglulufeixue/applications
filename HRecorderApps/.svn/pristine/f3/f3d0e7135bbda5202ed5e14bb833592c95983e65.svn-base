@@ -1,0 +1,226 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-05 13:42:41
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-25 09:44:42
+ */
+import React, { PureComponent } from 'react';
+import styles from './VideoDetails.less';
+import { connect } from 'dva';
+import share from '../../assets/share.png';
+import ShareModal from '../../components/ShareModal';
+import { Toast, Icon } from 'antd-mobile';
+import router from 'umi/router';
+import Nodata from '../../assets/no-data.png';
+import InfiniteScroll from 'react-infinite-scroller';
+
+class VideoDetails extends PureComponent {
+  state = {
+    isShare: false,
+  };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        elseVideoList: [],
+        elsePage: 1,
+        elsePageSize: 5,
+        viewCount: 0,
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoplayer/getElseVideoList',
+    });
+
+    dispatch({
+      type: 'videoplayer/viewCountAdd',
+    });
+  }
+
+  /**
+   * 加载更多
+   */
+  loadMore = () => {
+    const { dispatch, videoplayer } = this.props;
+    const { elsePageCount, elsePage } = videoplayer;
+    if (elsePage < elsePageCount) {
+      dispatch({
+        type: 'videoplayer/changeState',
+        payload: {
+          elsePage: elsePage + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'videoplayer/getElseVideoList',
+      });
+    }
+  };
+
+  onElseVideoItemClick = item => {
+    Toast.info('点击其他视频中的其中一个', 2);
+    //TODO 重新获取该作者的其他视频列表，当前播放视频变成点击的这个视频
+
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        videoName: item.videoTitle,
+        lookCount: item.viewsCount,
+        src: item.viewPath,
+        id: item.id,
+        viewCount: 0,
+      },
+    });
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        elseVideoList: [],
+        elsePage: 1,
+        elsePageSize: 5,
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoplayer/getElseVideoList',
+    });
+
+    dispatch({
+      type: 'videoplayer/viewCountAdd',
+    });
+  };
+
+  /**
+   * 获取其他视频
+   */
+  getElseVideoList() {
+    const { videoplayer } = this.props;
+    const { elseVideoList } = videoplayer;
+    const { onElseVideoItemClick } = this;
+    return elseVideoList.map((item, index) => {
+      const videoSrc = item.thumb;
+      const videoName = item.videoTitle;
+      const content = item.description;
+      const key = `list${index}`;
+      return (
+        <div
+          key={key}
+          className={styles.item}
+          onClick={() => {
+            onElseVideoItemClick({ ...item });
+          }}
+        >
+          <div className={styles.imgLayout}>
+            <img className={styles.img} src={videoSrc} alt="" />
+          </div>
+          <div className={styles.itemContentLayout}>
+            <span className={styles.videoName}>{videoName}</span>
+            <span className={styles.content}>{content}</span>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  /**
+   * 分享
+   */
+  share = () => {
+    // this.setState({
+    //   isShare: true,
+    // });
+    router.push('./ShareWatch');
+  };
+
+  // 取消分享框
+  cancelShareHandler = () => {
+    this.setState({
+      isShare: false,
+    });
+  };
+  back = () => {
+    router.push('./VideoPlayer');
+  };
+
+  onError = () => {
+    Toast.fail('播放失败！', 2);
+  };
+
+  render() {
+    const { videoplayer } = this.props;
+    const {
+      videoName,
+      src,
+      elseVideoList,
+      viewCount,
+      loading,
+      elsePage,
+      elsePageCount,
+    } = videoplayer;
+    const hasMore = elsePage < elsePageCount;
+    const { isShare } = this.state;
+    const shareModalProps = {
+      isShare,
+      cancelShareHandler: this.cancelShareHandler,
+    };
+    return (
+      <div className={styles.bg}>
+        <Icon type="left" size="m" color="#fff" className={styles.back} onClick={this.back} />
+        <video
+          className={styles.video}
+          controls
+          preload="auto"
+          src={src}
+          controlsList=" nodownload controlBar "
+          onError={this.onError}
+        />
+        <div className={styles.detailsLayout}>
+          <div className={styles.detail}>
+            <span className={styles.content}>{videoName}</span>
+            <span className={styles.count}>
+              {viewCount}
+              次播放
+            </span>
+          </div>
+          {/* share-alt */}
+          <Icon type="left" className={styles.share} onClick={this.share} />
+        </div>
+
+        <div className={styles.line} />
+
+        <div className={styles.elseVideoLayout}>
+          <span className={styles.autorElseVideoTitle}>作者其他作品</span>
+          {elseVideoList.length === 0 ? (
+            <div className={styles.nodataLayout}>
+              <img className={styles.nodateImg} src={Nodata} alt="" />
+              <div className={styles.nodataContent}>Opps！暂无视频信息</div>
+            </div>
+          ) : (
+            <InfiniteScroll
+              initialLoad={false}
+              pageStart={0}
+              hasMore={loading && hasMore}
+              loadMore={this.loadMore}
+            >
+              <div className={styles.elseVideo}>{this.getElseVideoList()}</div>
+            </InfiniteScroll>
+          )}
+        </div>
+        {isShare && <ShareModal {...shareModalProps} />}
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ videoplayer }) {
+  return {
+    videoplayer,
+  };
+}
+export default connect(mapStateToProps)(VideoDetails);

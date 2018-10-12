@@ -1,0 +1,56 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import styles from './StatsticsList.less';
+import img from '../../assets/bg.jpg';
+
+class StatsticsList extends PureComponent {
+  getList = list => {
+    return list.map((item, index) => {
+      const key = `list${index}`;
+      return (
+        <div key={key} className={styles.listItem}>
+          {index === 0 ? (
+            <div className={styles.orderNumberOne}>{index + 1}</div>
+          ) : index === 1 ? (
+            <div className={styles.orderNumberTwo}>{index + 1}</div>
+          ) : index === 2 ? (
+            <div className={styles.orderNumberThree}>{index + 1}</div>
+          ) : (
+            <div className={styles.orderNumberFour}>{index + 1}</div>
+          )}
+          <span className={styles.name}>{item.name}</span>
+          <span className={styles.num}>{item.num} 次</span>
+        </div>
+      );
+    });
+  };
+
+  render() {
+    const { teacherList } = this.props;
+    return (
+      <div>
+        <div className={styles.totleDataLayout}>
+          <div className={styles.totleDataLayoutItem}>
+            <img className={styles.totleNumImg} src={img} alt="" />
+            <div className={styles.totleNumContent}>直播总数</div>
+            <div className={styles.totleCiNum}>273</div>
+            <div className={styles.ci}>次</div>
+          </div>
+          <div className={styles.totleDataLayoutItem}>
+            <img className={styles.totleNumImg} src={img} alt="" />
+            <div className={styles.totleNumContent}>观看总人数</div>
+            <div className={styles.totleRenNum}>19960314</div>
+            <div className={styles.ci}>人</div>
+          </div>
+        </div>
+
+        <div className={styles.list}>
+          <div className={styles.listTitle}>教师排行</div>
+          <div className={styles.listLayout}>{this.getList(teacherList)}</div>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default connect()(StatsticsList);

@@ -1,0 +1,10 @@
+
+function BasicLayout(props) {
+    return (
+      <div>
+        巡课
+      </div>
+    );
+  }
+  
+  export default BasicLayout;

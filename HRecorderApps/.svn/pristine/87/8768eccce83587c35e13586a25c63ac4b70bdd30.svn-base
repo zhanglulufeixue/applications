@@ -1,0 +1,187 @@
+.video {
+  width: 100%;
+  height: 56vw;
+}
+.detailsLayout {
+  width: 96%;
+  margin-left: 4%;
+  float: left;
+
+  .detail {
+    width: 80%;
+    height: 100%;
+    float: left;
+
+    .content {
+      float: left;
+      width: 100%;
+      margin-top: 4.27vw;
+      font-size: 4.8vw;
+      color: #333333;
+    }
+
+    .count {
+      float: left;
+      width: 100%;
+      margin-top: 1.5vw;
+      font-size: 2.93vw;
+      color: #787878;
+    }
+    .uploadTime {
+      float: left;
+      width: 100%;
+      margin-top: 2.5vw;
+      font-size: 2.93vw;
+      color: #787878;
+    }
+  }
+  .introduceLayout {
+    margin-top: 4.27vw;
+    float: right;
+    margin-right: 0.2rem;
+
+    .introduceText {
+      font-size: 3.5vw;
+      color: #787878;
+    }
+
+    .introduceImg {
+      width: 3.5vw;
+      color: #787878;
+    }
+  }
+  .share {
+    margin-top: 6.4vw;
+    width: 10%;
+    float: right;
+    margin-right: 0.2rem;
+
+    :global(.iconfont) {
+      font-size: 5vw;
+      font-family: "iconfont" !important;
+      font-style: normal;
+      -webkit-font-smoothing: antialiased;
+    }
+  }
+}
+
+.introduce {
+  width: 96%;
+  margin-top: 4.27vw;
+  float: left;
+  font-size: 3.5vw;
+  color: #333333;
+  margin-left: 4%;
+  font-weight: bold;
+}
+
+.introduceContent {
+  width: 92%;
+  margin-top: 4.27vw;
+  font-size: 3.5vw;
+  color: #333333;
+  margin-left: 4%;
+  display: inline-block;
+  word-wrap: break-word;
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  background-color: #EBEBEB;
+  margin-top: 4.27vw;
+  float: left;
+}
+.elseVideoLayout {
+  margin-left: 4%;
+  width:96%;
+  margin-top: 5.33vw;
+  float: left;
+
+  .elseVideo {
+    width:100%;
+    height: 100%;
+    float: left;
+  }
+}
+
+.item {
+  width:100%;
+  height: 22.87%;
+  margin-top: 4%;
+  float: left;
+
+  .imgLayout {
+    width: 33.33vw;
+    height: 18.67vw;
+    float: left;
+    margin-right: 5px;
+
+    .videoSrc {
+    width: 100%;
+    height: 100%;
+    }
+  }
+
+  .itemContentLayout {
+    margin-left: 2%;
+    width: 59.3vw;;
+    height: 100%;
+    float: left;
+
+    .videoName {
+      width:100%;
+      float: left;
+      font-size: 3.47vw;
+      color: #333333;
+    }
+
+    .content {
+      width:100%;
+      float: left;
+      font-size: 3.47vw;
+      color: #787878;
+      margin-top: 3.2vw;
+      overflow:hidden; /*超出的部分隐藏起来。*/ 
+      white-space:nowrap;/*不显示的地方用省略号...代替*/
+      text-overflow:ellipsis;/* 支持 IE */
+      display:block;
+    }
+  }
+}
+
+.back {
+  position: fixed;
+  top: 5%;
+  z-index: 10;
+  margin-left: 5px;
+}
+
+.autorElseVideoTitle {
+  font-size: 4vw;
+  color: #333333;
+
+}
+
+.noDataLayout {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+
+  .noDataImg {
+    width: 65%;
+    height: 10%;
+    margin-top: 30%;
+  }
+
+  .noDataContent {
+    margin-top: 10px;
+    color: #ccc;
+  }
+}
+
+.bottomText {
+  text-align: center;
+  color: darkgray;
+  margin: 2% 0;
+}

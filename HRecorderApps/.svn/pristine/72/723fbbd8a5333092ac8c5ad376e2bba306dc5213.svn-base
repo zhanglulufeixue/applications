@@ -1,0 +1,218 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-04 14:45:48
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-25 13:32:12
+ */
+
+import React, { PureComponent } from 'react';
+import { SearchBar, Toast, NavBar, Icon } from 'antd-mobile';
+import { connect } from 'dva';
+import router from 'umi/router';
+import InfiniteScroll from 'react-infinite-scroller';
+import styles from './videoPlayer.less';
+import Nodata from '../../assets/no-data.png';
+
+class VideoPlayer extends PureComponent {
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        videoList: [],
+        page: 1,
+        pageSize: 10,
+        search: '',
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoplayer/getVideoList',
+    });
+  }
+
+  /**
+   * 视频列表点击事件
+   */
+  onVideoItemClick = item => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        videoName: item.videoTitle,
+        lookCount: item.viewsCount,
+        src: item.viewPath,
+        id: item.id,
+      },
+    });
+    router.push('./VideoDetails');
+  };
+
+  /**
+   * 加载更多
+   */
+  loadMore = () => {
+    const { dispatch, videoplayer } = this.props;
+    const { pageCount, page } = videoplayer;
+    if (page < pageCount) {
+      dispatch({
+        type: 'videoplayer/changeState',
+        payload: {
+          page: page + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'videoplayer/getVideoList',
+      });
+    }
+  };
+
+  /**
+   * 搜索事件
+   */
+  search = value => {
+    Toast.info(value, 2);
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoplayer/changeState',
+      payload: {
+        videoList: [],
+        page: 1,
+        pageSize: 10,
+        search: value,
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoplayer/getVideoList',
+    });
+  };
+
+  /**
+   * 监听搜索框内字的变化
+   */
+  onChange = val => {
+    if (val === '' || val === undefined) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'videoplayer/changeState',
+        payload: {
+          videoList: [],
+          page: 1,
+          pageSize: 10,
+          search: '',
+          loading: true,
+        },
+      });
+
+      dispatch({
+        type: 'videoplayer/getVideoList',
+      });
+    }
+  };
+
+  /**
+   * 获取视频列表
+   */
+  getVideoList() {
+    const { videoplayer } = this.props;
+    const { videoList } = videoplayer;
+    const { onVideoItemClick } = this;
+    return videoList.map((item, index) => {
+      const videoSrc = item.thumb;
+      const contents = item.videoTitle;
+      const key = `list${index}`;
+      return (
+        <div
+          key={key}
+          className={styles.itemLayout}
+          onClick={() => {
+            onVideoItemClick({ ...item });
+          }}
+        >
+          <div>
+            <img className={styles.img} src={videoSrc} alt="" />
+            <span className={styles.content}>{contents}</span>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  /**
+   * 返回到主页
+   */
+  back = () => {
+    router.push('./VideoDetails');
+  };
+
+  render() {
+    const { loadMore } = this;
+    const { videoplayer } = this.props;
+    const { loading, page, pageCount, videoList, search } = videoplayer;
+    const hasMore = page < pageCount;
+    return (
+      <div>
+        <NavBar
+          mode="light"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={() => {
+            router.push('/');
+          }}
+        >
+          视频
+        </NavBar>
+        {videoList.length === 0 && search === '' ? (
+          <div className={styles.nodataLayout}>
+            <img className={styles.nodateImg} src={Nodata} alt="" />
+            <div className={styles.nodataContent}>Opps！暂无视频信息</div>
+          </div>
+        ) : (videoList.length === 0 && search !== '' ? (
+            <div>
+              <SearchBar
+                placeholder="视频名称"
+                onSubmit={val => this.search(val)}
+                onChange={val => this.onChange(val)}
+              />
+              <div className={styles.nodataLayout}>
+                <img className={styles.nodateImg} src={Nodata} alt="" />
+                <div className={styles.nodataContent}>Opps！暂无视频信息</div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <SearchBar
+                placeholder="视频名称"
+                onSubmit={val => this.search(val)}
+                onChange={val => this.onChange(val)}
+              />
+              <div className={styles.list}>
+                <InfiniteScroll
+                  initialLoad={false}
+                  pageStart={0}
+                  loadMore={loadMore}
+                  hasMore={loading && hasMore}
+                  loader={<div key={0} className="loader">Loading...</div>}
+                  >
+                  <div>{this.getVideoList()}</div>
+                </InfiniteScroll>
+              </div>
+            </div>
+          )
+        )}
+      </div>
+    )
+  }
+}
+
+function mapStateToProps({ videoplayer }) {
+  return {
+    videoplayer,
+  };
+}
+
+export default connect(mapStateToProps)(VideoPlayer);

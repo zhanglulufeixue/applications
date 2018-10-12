@@ -1,0 +1,16 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="<%= context.publicPath %>iconfont/iconfont.css" />
+    <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="//imgcache.qq.com/open/qcloud/js/vod/sdk/ugcUploader.js"></script>
+    <script src="//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.min.js"></script>
+    <link href="//imgcache.qq.com/open/qcloud/video/tcplayer/tcplayer.css" rel="stylesheet">
+    <title>录播移动端</title>
+</head>
+<body>
+    <div id="root"></div>
+</body>
+</html>

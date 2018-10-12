@@ -1,0 +1,20 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-11 09:31:22
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-14 16:27:11
+ */
+
+
+const ip = '192.168.21.145';
+
+module.exports = {
+  name: 'app',
+
+  service: {
+    server: `http://${ip}:8801/`,
+    ip,
+  },
+
+};

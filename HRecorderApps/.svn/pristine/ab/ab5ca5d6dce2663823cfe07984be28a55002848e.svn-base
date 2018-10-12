@@ -1,0 +1,93 @@
+import React, { Component } from 'react';
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
+import 'videojs-flash';
+
+// require('./LiveVideoPlay.css');
+
+const flash = require('videojs-swf/dist/video-js.swf');
+
+class VideoTech extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      url: '',
+    };
+  }
+  componentDidMount() {
+    const that = this;
+    setTimeout(() => {
+      const {
+        // 视频播放路径
+        src,
+      } = that.props;
+
+      const videoJsOptions = {
+        techOrder: ['flash', 'html5'],
+        // controlBar: {
+        //   volumeMenuButton: { inline: false },
+        //   playToggle: false,
+        // },
+        autoplay: true,
+        language: 'zh-CN',
+        controls: true,
+        playbackRates: [0.5, 1, 1.5, 2],
+        nativeAudioTracks: true,
+        sources: [
+          {
+            // src: 'http://jq22com.qiniudn.com/jq22-sp.mp4',
+            src: 'http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8',
+            // type: 'rtmp/mp4',
+          },
+        ],
+
+        preload: 'auto',
+        loop: true,
+        live: true,
+        poster: '',
+        flash: {
+          swf: flash,
+          hls: {
+            withCredentials: true,
+          },
+        },
+      };
+
+      this.player = videojs(this.videoNode, videoJsOptions, () => {});
+      this.player.play();
+    }, 1000);
+  }
+
+
+  componentWillUnmount() {
+    if (this.player) {
+      this.player.dispose();
+    }
+  }
+
+  render() {
+    const { controls } = this.state;
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          padding: 0,
+        }}
+      >
+        <video
+        //   controls={controls === '' ? this.props.controls : controls}
+          style={{
+            width: '100%',
+            height: '100%',
+            padding: 0,
+          }}
+          ref={node => (this.videoNode = node)}
+          className="video-js vjs-default-skin vjs-big-play-centered vjs-fluid"
+        />
+      </div>
+    );
+  }
+}
+
+export default VideoTech;

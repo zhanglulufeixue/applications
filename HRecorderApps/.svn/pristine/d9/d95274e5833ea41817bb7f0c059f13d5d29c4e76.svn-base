@@ -1,0 +1,155 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { createForm } from 'rc-form';
+import { NavBar ,InputItem, Toast, TextareaItem  } from 'antd-mobile';
+import styles from './UploadVideo.less';
+import router from 'umi/router';
+import config from '../../utils/config.js';
+
+
+class UploadVideo extends PureComponent {
+
+  state = {
+  };
+
+  componentDidUpdate() {
+    const { form } = this.props;
+    const { getFieldValue } = form;
+    if(getFieldValue('uploadTitle') && getFieldValue('uploadTitle').length > 30) {
+      Toast.info('直播名称最多30个字');
+    }
+  }
+
+  // 取消预约按钮回调
+  cancelHandler = () => {
+    router.push('/Videos');
+  };
+
+  getSignature = function(callback) {
+    window.$.ajax({
+      url: `http://${config.service.ipSign}:${
+        config.service.port
+      }/frontend/service/video/get-web-signature`, //获取客户端上传签名的 URL
+      type: 'POST',
+      dataType: 'json',
+      success: function(result) {
+        //result 是派发签名服务器的回包
+        //假设回包为 { "code": 0, "signature": "xxxx"  }
+        //将签名传入 callback，SDK 则能获取这个上传签名，用于后续的上传视频步骤。
+        callback(result.result);
+      },
+      error: function(result) {
+        console.log('getSignatureerror', result);
+      },
+    });
+  };
+
+  // 点击预约按钮事件
+  uploadHandler = () => {
+    const { form, dispatch, videoPlayer } = this.props;
+    const { uploadFile } = videoPlayer;
+     
+    const { validateFields } = form;
+    validateFields((err, value) => {
+      if(err) {
+        Toast.info('请填写完整信息');
+        return;
+      }
+      window.qcVideo.ugcUploader.start({
+        videoFile: uploadFile,
+        // allowAudio: 1,
+        // isTranscode: 1,
+        getSignature: this.getSignature,
+        success: function(result) {
+          console.log('success', result);
+        },
+        error: function(result) {
+          console.log('error', result);
+        },
+        progress: function(result) {
+          console.log('progress', result);
+          window.$('#progressId').text(Math.floor(result.curr * 100) + '%');
+        },
+        finish: function(result) {
+          console.log('finish', result);
+          if (!result) {
+            return false;
+          }
+          dispatch({
+            type: 'videoPlayer/savePhoneVideo',
+            payload: {
+              fileId: result.fileId,
+              videoUrl: result.videoUrl,
+              videoName: value.uploadTitle,
+              description: value.uploadDescription,
+            },
+          });
+          router.push('/Videos');
+        },
+      });
+      Toast.info('上传成功');
+      
+    });
+  };
+
+  render() {
+    const { form, videoPlayer} = this.props;
+    const { getFieldProps, getFieldValue } = form;
+    return (
+      <div>
+       <NavBar
+          key='upload'
+          mode="light"
+          leftContent={[
+            <span key='upload-add1' style={{ marginLeft: '10%', fontSize: '4vw' }}onClick={() => {router.push('/Videos');}}>取消</span>,
+          ]}
+          rightContent={[
+            <span key='upload-add1' onClick={this.uploadHandler} className={styles.uploadBtn}>上传</span>,
+          ]}
+        >
+        </NavBar>
+        <div style={{ clear: 'both', textAlign: 'right', marginRight: '5%', fontSize: '3vw' }}>
+          <span>上传进度：</span>
+          <span id="progressId" />
+        </div>
+        <form className={styles.form}>
+          <div className={styles.row}>
+            <span className={styles.leftName}>视频名称:</span>
+            <InputItem {...getFieldProps('uploadTitle', {
+              initialValue: '',
+              rules: [{
+                required: true,
+                message: '请输入视频名称',
+              }
+            ]
+          })} placeholder="请输入视频名称" maxLength={30} ></InputItem>
+          
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>上传教师:</span>
+            <InputItem {...getFieldProps('uploadTeacher', {
+              initialValue: '张老师',
+            })} clear disabled></InputItem>
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>视频简介:</span>
+            <TextareaItem  {...getFieldProps('uploadDescription', {
+              initialValue: '',
+            })} clear placeholder="最多200字" maxLength={200} autoHeight editable></TextareaItem >
+            <div className={styles.line}></div>
+          </div>            
+        </form>
+      </div>
+    
+    );
+  }
+}
+function mapStateToProps({ videoPlayer }) {
+  return {
+    videoPlayer,
+  };
+}
+
+export default connect(mapStateToProps)(createForm()(UploadVideo));

@@ -1,0 +1,27 @@
+import { NavBar, Icon } from 'antd-mobile';
+import styles from './tourCourse.css';
+import router from 'umi/router';
+
+function Scan(props) {
+  function back() {
+    router.push('tourCourse');
+  }
+
+  return (
+    <div>
+      <NavBar
+        mode="light"
+        icon={<Icon type="left" onClick={back} />}
+        onLeftClick={() => console.log('onLeftClick')}
+        rightContent={[
+          <Icon key="0" type="cross" style={{ marginRight: '16px' }} onClick={back} />,
+          // <span key="1">搜索</span>,
+        ]}
+      >
+        识别二维码
+      </NavBar>
+    </div>
+  );
+}
+
+export default Scan;

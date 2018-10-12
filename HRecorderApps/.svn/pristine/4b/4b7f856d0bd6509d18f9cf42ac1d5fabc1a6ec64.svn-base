@@ -1,0 +1,112 @@
+import React, { PureComponent, Fragment } from 'react';
+import { connect } from 'dva';
+import moment from 'moment';
+import { Icon, NavBar ,InputItem, Button, DatePicker, List } from 'antd-mobile';
+import styles from './orderModal.less';
+import router from 'umi/router';
+import { createForm } from 'rc-form';
+
+
+class orderModal extends PureComponent {
+
+  state = {
+    
+  };
+
+  // 取消预约按钮回调
+  cancelHandler = () => {
+    router.push('/liveVideo/liveVideo');
+  };
+
+  // 点击预约按钮事件
+  orderHandler = () => {
+    router.push('/liveVideo/components/orderFailList');
+  };
+
+  render() {
+    const { form, liveVideo} = this.props;
+    const { getFieldProps } = form;
+    const { orderOrEdit } = liveVideo;
+
+    return (
+      <div>
+       <NavBar
+          key='order'
+          mode="light"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={this.cancelHandler}
+        >
+          {orderOrEdit === '0' ? '预约直播' : '修改直播'}
+        </NavBar>
+        <form className={styles.form}>
+          <div className={styles.row}>
+            <span className={styles.leftName}>直播标题:</span>
+            <InputItem {...getFieldProps('liveTitle', {
+              initialValue: '',
+            })} clear placeholder="请输入直播标题"></InputItem>
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>直播教师:</span>
+            <InputItem {...getFieldProps('liveTeacher', {
+              initialValue: '',
+            })} clear placeholder="请输入直播教师"></InputItem>
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>直播日期:</span>
+            <DatePicker
+              {...getFieldProps('startTime', {
+                initialValue: '',
+              })}
+              mode='date'
+            >
+                <List.Item arrow="horizontal"></List.Item>
+            </DatePicker>
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>直播开始时间:</span>
+            <DatePicker
+              {...getFieldProps('startTime', {
+                initialValue: '',
+              })}
+              mode='time'
+            >
+                <List.Item arrow="horizontal"></List.Item>
+            </DatePicker>
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>直播结束日期:</span>
+            <DatePicker
+              {...getFieldProps('endTime', {
+                initialValue: '',
+              })}
+              mode='time'
+            >
+                <List.Item arrow="horizontal"></List.Item>
+            </DatePicker>
+            <div className={styles.line}></div>
+          </div>
+          <div className={styles.row}>
+            <span className={styles.leftName}>直播教室:</span>
+            <span className={styles.scan}>扫一扫</span>
+            <span className={styles.bindRoom}>请扫码绑定教室</span>
+          </div>
+          <div  className={styles.btns}>
+            <Button inline onClick={this.orderHandler}>预约</Button>
+          </div>
+        </form>
+      </div>
+    
+    );
+  }
+}
+function mapStateToProps({ liveVideo }) {
+  return {
+    liveVideo,
+  };
+}
+
+export default connect(mapStateToProps)(createForm()(orderModal));

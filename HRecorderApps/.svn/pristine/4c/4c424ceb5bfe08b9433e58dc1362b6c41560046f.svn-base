@@ -1,0 +1,9 @@
+import request from '../utils/request';
+import { service } from '../utils/config';
+
+export async function getLiveVideoList(params) {
+  return request(`${service.server}frontend/service/video/page-live-video-list`, {
+    method: 'GET',
+    data: params,
+  });
+}

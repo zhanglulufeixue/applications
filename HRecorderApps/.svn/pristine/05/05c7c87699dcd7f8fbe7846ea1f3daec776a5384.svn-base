@@ -1,0 +1,72 @@
+
+import { Toast } from 'antd-mobile';
+
+export default {
+
+  namespace: 'liveVideo',
+
+  state: {
+    orderOrEdit: '',  // 0-预约直播  1-修改直播内容 
+    // 直播列表
+    liveVideoList: [{
+        id: '1',
+        name: '期末考试冲刺',
+        teacherName: '张老师',
+        date: '2018.08.27 08:00至10：00',
+        room: '一年一班',
+        state: '0',
+      }, {
+        id: '2',
+        name: '未开始期末考试冲刺',
+        teacherName: '张老师',
+        date: '2018.08.27 08:00至10：00',
+        room: '一年一班',
+        state: '1',
+      }, {
+        id: '3',
+        name: '已结束期末考试冲刺',
+        teacherName: '张老师',
+        date: '2018.08.27 08:00至10：00',
+        room: '一年一班',
+        state: '2',
+      },  {
+        id: '4',
+        name: '已结束期末考试冲刺',
+        teacherName: '张老师',
+        date: '2018.08.27 08:00至10：00',
+        room: '一年一班',
+        state: '2',
+      },  {
+        id: '5',
+        name: '已结束期末考试冲刺',
+        teacherName: '张老师',
+        date: '2018.08.27 08:00至10：00',
+        room: '一年一班',
+        state: '2',
+      }
+    ],
+    isShare: false,  // 是否点击分享
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  effects: {
+
+  },
+
+  subscriptions: {
+    setup({ dispatch, history }) {  // eslint-disable-line     
+      history.listen((location) => {
+        const { pathname } = location;
+        if (pathname === '/liveVideo/liveVideo') {
+            console.log('model', pathname);
+        }
+      });
+    },
+  },
+
+};

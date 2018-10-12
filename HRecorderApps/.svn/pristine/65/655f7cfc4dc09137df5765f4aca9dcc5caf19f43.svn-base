@@ -1,0 +1,382 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import moment from 'moment';
+import RcUpload from 'rc-upload';
+import InfiniteScroll from 'react-infinite-scroller';
+import { SearchBar, Icon, NavBar, Modal, Toast } from 'antd-mobile';
+import styles from './index.less';
+import router from 'umi/router';
+import ShareModal from '../../components/ShareModal.js';
+import noDataImg from '../../assets/no-data.png';
+
+const alert = Modal.alert;
+
+class LiveVideo extends PureComponent {
+
+  state = {
+    keyword: '',
+  };
+
+  componentWillMount() {
+    const { loading } = this.props;
+    if (loading) {
+      Toast.hide();
+      Toast.loading('正在加载中,请稍后', 0);
+    }
+  }
+
+  componentDidMount() {
+    const { loading } = this.props;
+    if (!loading) {
+      Toast.hide();
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (!nextProps.loading) {
+      Toast.hide();
+    }
+  }
+
+  // 编辑直播内容
+  editLiveHandler = (id) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        orderOrEdit: '1', 
+        liveId: id, 
+      },
+    });
+    dispatch({
+      type: 'liveVideo/getLiveInfo',
+      payload: {
+        liveId: id, 
+      },
+    });
+    router.push('/Lives/components/Order');
+  };
+
+  // 分享直播内容
+  shareLiveHandler = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        isShare: true, 
+      },
+    });
+  };
+
+  // 删除已结束直播
+  deleteLiveVideo = (id) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/deleteLive',
+      payload: {
+        liveId: id, 
+      },
+    });
+  };
+
+  // 判断直播状态
+  judgeLiveState = (startTime, endTime) => {
+    let state = 0;
+    const now = moment().format('YYYY-MM-DD HH:mm:ss');
+    const isBetween = moment(now).isBetween(startTime, endTime);
+    const isBefore = moment(now).isBefore(moment(startTime).format('YYYY-MM-DD HH:mm:ss'));
+    const isAfter = moment(now).isAfter(moment(endTime).format('YYYY-MM-DD HH:mm:ss'));
+    if(isBetween) {
+      state = '0'; //正在直播
+    }
+    if(isAfter) {
+      state = '2'; //已结束
+    }
+    if(isBefore) {
+      state = '1'; //未开始
+    }
+    return state;
+  };
+
+  // 获取直播列表
+  getLiveVideoList = () => {
+    const { liveVideo } = this.props;
+    const { liveVideoList } = liveVideo;
+    if (liveVideoList.length === 0) {
+      return;
+    }
+    return liveVideoList.map((item, index) => {
+      const liveState = this.judgeLiveState(item.startTime, item.endTime);
+      return (
+        <div key={item.id} className={styles.itemContent}>
+          <span className={styles.itemTitle}>{item.title}</span>
+          <span className={styles.itemState} style={{backgroundColor: `${liveState === '0' ? '#fe2525' : liveState === '1' ? '#2798fc' : '#ccc'}`}}>{liveState === '0' ? '正在直播' : liveState === '1' ? '未开始' : '已结束'}</span>
+          <div className={styles.itemDate}>{`${moment(item.startTime).format('YYYY-MM-DD HH:mm')} 至 ${moment(item.endTime).format('HH:mm')}`}</div>
+          <div>
+          {/* <div className={styles.itemRoom}>{`已绑定教室：${item.room}` }</div> */}
+          <div className={styles.line}></div>
+          <div className={styles.itemOperateInfo}>
+            {
+              liveState === '0'
+              ? <div>
+                  <div className={styles.itemDeleteDisable}>
+                    <i className='iconfont icon-delete-copy'></i>
+                  </div>
+                  <div className={styles.itemShare} onClick={() => {
+                     this.shareLiveHandler();
+                    }}>
+                    <i className='iconfont icon-tubiao212'></i>
+                  </div>
+                   <div className={styles.itemEditDisable}>
+                    <i className='iconfont icon-edit1-copy'></i>
+                  </div>
+                </div> 
+              : liveState === '1'
+              ? <div>
+                  <div className={styles.itemDelete} 
+                    onClick={() => alert('Delete', 'Are you sure???', [
+                        { text: 'Cancel', onPress: () => console.log('cancel') },
+                        { text: 'Ok', onPress: () => this.deleteLiveVideo(item.id) },
+                    ])}>
+                    <i className='iconfont icon-delete'></i>
+                  </div>
+                  <div className={styles.itemShare} onClick={() => {
+                     this.shareLiveHandler();
+                    }}>
+                    <i className='iconfont icon-tubiao212'></i>
+                  </div>
+                  <div className={styles.itemEdit} type='check' onClick={() => {
+                    this.editLiveHandler(item.id);
+                  }}>
+                    <i className='iconfont icon-edit1'></i>
+                  </div>
+                </div> 
+              : <div>
+                    <div className={styles.itemDelete} 
+                      onClick={() =>
+                        alert('Delete', 'Are you sure???', [
+                         { text: 'Cancel', onPress: () => console.log('cancel') },
+                         { text: 'Ok', onPress: () => this.deleteLiveVideo(item.id) },
+                        ])
+                       }
+                    >
+                      <i className='iconfont icon-delete'></i>
+                    </div>
+                    
+                  <div className={styles.itemShareDisable}>
+                    <i className='iconfont icon-tubiao212-copy'></i>
+                  </div>
+                  <div className={styles.itemEditDisable}>
+                    <i className='iconfont icon-edit1-copy'></i>
+                  </div>
+           </div>
+            }
+          </div>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  // 添加预约加号事件
+  addOrderHandler = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        orderOrEdit: '0', 
+        liveDetailInfo: {},
+        orderContent: {},
+      },
+    });
+    router.push('/Lives/components/Order');
+  };
+
+  // 取消分享事件
+  cancelShareHandler = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        isShare: false, 
+      },
+    });
+  };
+
+  // 加载更多 
+  loadMore = () => {
+    const { dispatch, liveVideo } = this.props;
+    const { livePage, livePageCount } = liveVideo;
+    if (livePage < livePageCount) {
+      dispatch({
+        type: 'liveVideo/changeState',
+        payload: {
+          livePage: livePage + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'liveVideo/getLiveVideoList',
+      });
+    }
+  };
+
+  // 搜索视频失去焦点事件回调
+  onSearchBlurHandler = () => {
+    const { keyword } = this.state; 
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        liveVideoList: [],
+        livePage: 1,
+        livePageSize: 6,
+        keyword,
+      },
+    });
+
+    dispatch({
+      type: 'liveVideo/getLiveVideoList',
+    });
+  };
+
+  // 搜索视频关键字改变事件回调
+  onSearchChangeHandler = (val) => {
+    this.setState({
+      keyword: val,
+    });
+
+    if(val === '') {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'liveVideo/changeState',
+        payload: {
+          liveVideoList: [],
+          livePage: 1,
+          livePageSize: 6,
+          keyword: '',
+        },
+      });
+  
+      dispatch({
+        type: 'liveVideo/getLiveVideoList',
+      });
+    }
+  };
+
+  beforeUpload = (file) => {
+    console.log('file', file);
+    const isJPG = file.type === 'application/mp4';
+    if (!isJPG) {
+      Toast.info('You can only upload JPG file!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      Toast.info('Image must smaller than 2MB!');
+    }
+    return isJPG && isLt2M;
+  }
+  
+
+  render() {
+    const { keyword } = this.state;
+    const { loadMore, onSearchBlurHandler, onSearchChangeHandler } = this;
+    const { liveVideo } = this.props;
+    const { isShare} = liveVideo;
+    const { liveVideoList, loadingMore, livePage, livePageCount, liveVideoTotal } = liveVideo;
+    const hasMore = livePage < livePageCount;
+    const shareModalProps = {
+      isShare,
+      cancelShareHandler: this.cancelShareHandler,
+    };
+
+    return (
+      <div className={styles.videoContent}>
+        <NavBar
+            key='liveVideo'
+            mode="light"
+            icon={<Icon type="left" size="lg" />}
+            onLeftClick={() => {
+              router.push('/');
+            }}
+            rightContent={[
+              <Icon key='liveVideo-add' type="plus" style={{ marginRight: '5%' }} onClick={this.addOrderHandler} />,
+              <span key='liveVideo-add1'>预约</span>,
+            ]}
+          >
+            我的直播
+        </NavBar>
+        {/* <span>上传视频</span> */}
+        <RcUpload
+            className={styles.upload}
+            // {...rcUploadProps}
+            accept='video/*'
+            beforeUpload={this.beforeUpload}
+            // onError={this.onError}
+            // onSuccess={this.onSuccess}
+            // onProgress={this.onProgress}
+          >
+            <Icon key='liveVideo-add' type="plus" />
+          </RcUpload>
+        
+        {
+          keyword === '' &&  liveVideoList && liveVideoList.length === 0    
+          ? <div>
+              <img src={noDataImg} alt='' className={styles.noData}></img>
+              <div className={styles.noDataText}>Opps！暂无视频信息</div>
+            </div>
+          : keyword !== '' &&  liveVideoList && liveVideoList.length === 0
+          ?  <div>
+              <SearchBar 
+                placeholder="请输入直播名称" 
+                onChange={onSearchChangeHandler}
+                value={keyword}
+                onBlur={onSearchBlurHandler}></SearchBar>
+              <div>
+                <img src={noDataImg} alt='' className={styles.noData}></img>
+                <div className={styles.noDataText}>Opps！暂无视频信息</div>
+              </div>
+            </div>
+          : <div>
+            <SearchBar 
+              placeholder="请输入直播名称" 
+              onChange={onSearchChangeHandler}
+              value={keyword}
+              onBlur={onSearchBlurHandler}></SearchBar>
+            <div>
+              <InfiniteScroll
+                initialLoad={false}
+                pageStart={0}
+                hasMore={!loadingMore && hasMore}
+                loadMore={loadMore}
+                loader={
+                  <div className="loadMore" key={0}>
+                    加载中
+                  </div>
+                }
+              >
+                {this.getLiveVideoList()}
+              </InfiniteScroll>
+            </div>
+            {
+              liveVideoTotal == liveVideoList.length
+              ? <div className={styles.bottomText}>我是有底线的</div>
+              : ''
+            }
+            
+          </div>
+        }
+        {/* <Icon className={styles.plus} type='plus' onClick={this.addOrderHandler}></Icon> */}
+        {isShare && <ShareModal {...shareModalProps}></ShareModal>}
+      </div>
+    );
+  }
+}
+function mapStateToProps({ liveVideo, loading }) {
+  return {
+    liveVideo,
+    loading: loading.global,
+  };
+}
+
+export default connect(mapStateToProps)(LiveVideo);

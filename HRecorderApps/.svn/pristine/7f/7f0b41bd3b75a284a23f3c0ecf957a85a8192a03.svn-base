@@ -1,0 +1,192 @@
+import React, { PureComponent } from 'react';
+import { createForm } from 'rc-form/lib';
+import { WingBlank, WhiteSpace } from 'antd-mobile';
+import { connect } from 'dva';
+import { Icon } from 'antd-mobile';
+import styles from './watchVideo.css';
+import router from 'umi/router';
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
+import 'videojs-flash';
+
+const flash = require('videojs-swf/dist/video-js.swf');
+
+class watchVideo extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      url: '',
+    };
+  }
+  componentDidMount() {
+    const that = this;
+    setTimeout(() => {
+      const {
+        // 视频播放路径
+        src,
+      } = that.props;
+
+      const videoJsOptions = {
+        techOrder: ['flash', 'html5'],
+        // controlBar: {
+        //   volumeMenuButton: { inline: false },
+        //   playToggle: false,
+        // },
+        autoplay: true,
+        language: 'zh-CN',
+        controls: true,
+        playbackRates: [0.5, 1, 1.5, 2],
+        nativeAudioTracks: true,
+        sources: [
+          {
+            // src: 'http://jq22com.qiniudn.com/jq22-sp.mp4',
+            src: 'http://ivi.bupt.edu.cn/hls/cctv1hd.m3u8',
+            // type: 'rtmp/mp4',
+          },
+        ],
+
+        preload: 'auto',
+        loop: true,
+        live: true,
+        poster: '',
+        flash: {
+          swf: flash,
+          hls: {
+            withCredentials: true,
+          },
+        },
+      };
+
+      this.player = videojs(this.videoNode, videoJsOptions, () => {});
+      this.player.play();
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    if (this.player) {
+      this.player.dispose();
+    }
+  }
+
+  /**
+   * 视频列表点击事件
+   */
+  onVideoItemClick = item => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        classname: item.classname,
+        teacher: item.teacher,
+        videotype: item.videotype,
+      },
+    });
+  };
+
+  back = () => {
+    console.log('111111111');
+    router.push('tourCourse');
+    // e.cancelBubble=true;
+  };
+  // 获取镜头列表
+  gettourCourseList = () => {
+    const { tourCourse } = this.props;
+    const { tourCourseList } = tourCourse;
+    const { onVideoItemClick } = this;
+    if (tourCourseList.length === 0) {
+      return;
+    }
+    return tourCourseList.map((item, index) => {
+      return (
+        <div
+          key={item.id}
+          onClick={() => {
+            onVideoItemClick({ ...item });
+          }}
+        >
+          <WhiteSpace size="md" />
+          <WingBlank size="lg">
+            <div style={{ width: '100%', float: 'left' }}>
+              <img
+                alt=""
+                src={item.videopic}
+                style={{ float: 'left', width: '30%', height: '80px', marginTop: '3%' }}
+              />
+              <div style={{ float: 'left', marginLeft: '4%', marginTop: '3%' }}>
+                {item.videotype}
+              </div>
+            </div>
+          </WingBlank>
+        </div>
+      );
+    });
+  };
+
+  render() {
+    const { controls } = this.state;
+    const { tourCourse } = this.props;
+    const { classroom, teacher, videotype } = tourCourse;
+    return (
+      <div>
+        {/* <NavBar
+          mode="light"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={() => console.log('onLeftClick')}
+          rightContent={[
+            <Icon
+              key="0"
+              type="plus"
+              style={{ marginRight: '16px' }}
+              onClick={this.goToListPage}
+            />,
+            // <span key="1">搜索</span>,
+            // <span key="0">+</span>,
+          ]}
+        >
+          巡课
+        </NavBar> */}
+        <div style={{ width: '100%', fontSize: '12px' }}>
+          <div>
+            <Icon type="left" size="sm" color="#fff" className={styles.back} onClick={this.back} />
+          </div>
+          <div>
+            <video
+              // id="my-player"
+              // preload="auto"
+              width="100%"
+              // // poster="//vjs.zencdn.net/v/oceans.png"
+              // controls="true"
+              // src="//media.html5media.info/video.mp4"
+              // controlsList=" nodownload controlBar "
+              ref={node => (this.videoNode = node)}
+              className="video-js vjs-default-skin vjs-big-play-centered vjs-fluid"
+              z-index="1"
+            />
+          </div>
+          <div />
+          <div style={{ fontWeight: 'bold' }}>
+            <div style={{ margin: '3%' }}>
+              {classroom}
+              <span style={{ margin: '3%' }}>{videotype}</span>
+            </div>
+
+            <div style={{ margin: '3%' }}>{teacher}</div>
+            <div className={styles.line} />
+          </div>
+          <div>
+            <div style={{ marginTop: '3%', marginLeft: '4%', fontWeight: 'bold' }}>其他镜头</div>
+            {this.gettourCourseList()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ tourCourse }) {
+  return {
+    tourCourse,
+  };
+}
+
+export default connect(mapStateToProps)(createForm()(watchVideo));

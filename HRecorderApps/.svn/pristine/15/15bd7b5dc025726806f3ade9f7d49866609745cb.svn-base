@@ -1,0 +1,45 @@
+.orderFailList {
+    padding: 4%;
+}
+
+.title {
+    text-align: center;
+    margin: 4%;
+    font-size: 16px;
+}
+
+.mark {
+    color: #f00;
+    margin-bottom: 4%;
+}
+
+.timeSelect {
+    text-align: center;
+    margin: 3%;
+    color: rgb(33, 160, 50);
+}
+
+.stepBar {
+    width: 100%;
+    height: 100%;
+}
+
+.stepIcon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid blue;
+}
+
+.btns {
+    position: fixed;
+    width: 92%;
+    bottom: 4%;
+
+    :global(.am-button) {
+        float: left;
+        width: 46%;
+        text-align: center;
+        margin-right: 4%;
+    }
+}

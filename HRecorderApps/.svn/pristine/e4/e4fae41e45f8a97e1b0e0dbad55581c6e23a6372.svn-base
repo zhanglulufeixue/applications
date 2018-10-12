@@ -1,0 +1,110 @@
+.bg {
+  width: 100%;
+  height: 100%;
+
+  :global(.am-list-item) {     
+        border: 1px solid #ccc;
+        border-radius: 28px;
+        min-height: 35px;
+    } 
+    :global(.am-input-item) {     
+        height: 35px;
+    } 
+    :global(.am-navbar-left) {     
+        padding-left: 0px;
+    } 
+    :global(.am-list-item .am-input-control input) {     
+        font-size: 14px;
+    } 
+
+    :global(.am-search) {
+        background-color: transparent;
+        margin-top: 2%;
+        margin-right: 2%;
+        margin-bottom: -2%;
+        margin-left: 2%;
+    }
+
+    :global(.am-search-input) {
+        border: 1px solid #ddd;
+        border-radius: 28px;
+        height: 35px;
+    }
+
+    :global(.sub-title) {
+       color: #888;
+       font-size: 14px;
+       padding: 30px 0 18px 0;
+    }
+    :global(.am-search-input .am-search-synthetic-ph) {
+      height: 35px;
+      line-height: 35px;
+      text-align: left;
+      margin-left: 20px;
+    }
+    :global(.am-search-input input[type="search"]) {
+      height: 35px;
+      margin-left: 21px;
+    }
+    :global(.am-search-input .am-search-clear){
+      padding-top: 10px;
+      padding-right: 6.5px;
+      padding-bottom: 10px;
+      padding-left: 6.5px;
+    }
+}
+
+.titleLayout {
+  width: 100%;
+  height: 3%;
+  background-color: darkblue;
+  padding-top: 5%;
+  padding-bottom: 5%;
+
+  .back {
+    width: 8%;
+    float: left;
+    padding-left: 5%;
+  }
+
+  .title {
+    width: 100%;
+    height: 4.5%;
+    color: aliceblue;
+    font-size: 16px;
+    padding-left: 40%;
+  }
+}
+
+
+.list {
+  width: 100%;
+  height: 20%;
+
+
+
+  .itemLayout {
+  width: ~'calc(50% - 4px)';
+  height: 145px;
+  padding: 13px 2px 0px 2px;
+  float: left;
+
+  
+    .img {
+      width: 100%;
+      height: 110px;
+    }
+
+    .content {
+      float: left;
+      font-size: 16px;
+      margin-left: 2%;
+      margin-top: 5%;
+    }
+
+}
+}
+
+
+
+

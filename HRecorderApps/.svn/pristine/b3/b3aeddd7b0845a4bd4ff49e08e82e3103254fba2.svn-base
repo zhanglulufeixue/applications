@@ -1,0 +1,125 @@
+import React, { PureComponent } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import { NavBar, Icon, WingBlank, WhiteSpace } from '../../../node_modules/antd-mobile';
+// import InfiniteScroll from 'react-infinite-scroller';
+import { connect } from 'dva';
+import styles from './tourCourse.css';
+import router from 'umi/router';
+
+class BasicLayout extends PureComponent {
+  // function BasicLayout(props) {
+
+  //跳转扫码界面
+  goToListPage = () => {
+    router.push('Scan');
+  };
+  //跳转播放
+  videoPlayer = () => {
+    router.push('watchVideo');
+  };
+//返回按钮
+  back = () => {
+    router.push('/');
+  };
+
+  // 获取巡课列表
+  gettourCourseList = () => {
+    const { tourCourse } = this.props;
+    console.log('tourCourse++', tourCourse);
+    const { tourCourseList } = tourCourse;
+    console.log('tourCourseList', tourCourseList);
+    if (tourCourseList.length === 0) {
+      return;
+    }
+    return tourCourseList.map((item, index) => {
+      return (
+        <div key={item.id} onClick={this.videoPlayer}>
+          <WhiteSpace size="lg" />
+          <WingBlank size="lg">
+            <div>
+              <img alt="" src={item.videopic} />
+              <div className={styles.whichclass}>{item.room}</div>
+            </div>
+          </WingBlank>
+        </div>
+      );
+    });
+  };
+
+  // 加载更多函数
+  loadMore = () => {
+    console.log('上拉加载', '上拉加载');
+    const { tourCourseList, videopic } = this.state;
+    const list = [{ src: { videopic }, content: '这是上拉加载' }];
+    const list1 = tourCourseList.concat(list);
+    console.log('list1', list1);
+    this.setState({
+      tourCourseList: list1,
+      loading: true,
+    });
+  };
+
+  render() {
+    const { tourCourse, loading, total } = this.props;
+    const { tourCourseList } = tourCourse;
+    const hasMore = total > tourCourseList.length;
+    return (
+      <div>
+        <NavBar
+          mode="light"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={this.back}
+          rightContent={[
+            <Icon
+              key="0"
+              type="plus"
+              style={{ marginRight: '16px' }}
+              onClick={this.goToListPage}
+            />,
+            // <span key="1">搜索</span>,
+            // <span key="0">+</span>,
+          ]}
+        >
+          巡课
+        </NavBar>
+        {/* <div className={styles.videoContent}>{this.gettourCourseList()}</div> */}
+        <InfiniteScroll
+          initialLoad={false}
+          pageStart={0}
+          loadMore={this.loadMore}
+          hasMore={!loading && hasMore}
+          loader={
+            <div className="loadMore" key={0}>
+              加载中
+            </div>
+          }
+          useWindow={false}
+        >
+          <div>
+            {tourCourseList.length > 0 ? (
+              this.gettourCourseList()
+            ) : (
+              <div>
+                <WhiteSpace size="lg" />
+                <WingBlank size="lg">
+                  <div className={styles.add} onClick={this.goToListPage}>
+                    <Icon type="plus" size="xs" style={{ marginRight: '16px' }} />
+                    <div style={{ marginTop: '-30%' }}>扫一扫添加班级</div>
+                  </div>
+                </WingBlank>
+              </div>
+            )}
+          </div>
+        </InfiniteScroll>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ tourCourse }) {
+  return {
+    tourCourse,
+  };
+}
+
+export default connect(mapStateToProps)(BasicLayout);

@@ -1,0 +1,41 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-05 14:47:40
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-06 14:10:35
+ */
+
+import img from '../../assets/yay.jpg';
+
+export default {
+  namespace: 'videoplayer',
+
+  state: {
+    videoList: [
+      {
+        src: { img },
+        videoName: '论读书的重要性',
+        lookCount: 888888,
+        content: '确实很重要啊，，，，',
+      },
+      { src: { img }, videoName: '你想对qianren说句什么', lookCount: 666666, content: '再看一眼，还是很想拥有' },
+    ],
+    content: '',
+    lookCount: 0,
+    src: '',
+  },
+
+  reducers: {
+    changeState(state, action) {
+      return { ...state, ...action.payload };
+    },
+  },
+
+  effects: {},
+
+  subscriptions: {
+    setup({ dispatch, history }) {
+    },
+  },
+};

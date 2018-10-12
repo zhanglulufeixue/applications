@@ -1,0 +1,202 @@
+import React, { PureComponent } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import { NavBar, Icon, WingBlank } from '../../../node_modules/antd-mobile';
+import { connect } from 'dva';
+import styles from './tourCourse.css';
+import router from 'umi/router';
+import { SearchBar, Toast } from 'antd-mobile';
+import go from '../../assets/go.png';
+
+class BasicLayout extends PureComponent {
+  state = {
+    isLoadList: null,
+  };
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        videoList: [],
+        page: 1,
+        pageSize: 10,
+        search: '',
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'tourCourse/getVideoList',
+    });
+  }
+  /**
+   * 视频列表点击事件
+   */
+  onVideoItemClick = item => {
+    const { dispatch } = this.props;
+    console.log('item.computer+++++++', item.computer);
+
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        src: item.computer,
+        deviceName: item.deviceName,
+        tourId: item.tourId,
+      },
+    });
+    router.push('./watchVideo');
+  };
+
+  //跳转扫码界面
+  goToListPage = () => {
+    router.push('Scan');
+  };
+
+  //返回按钮
+  back = () => {
+    router.push('/');
+  };
+
+  // 获取巡课列表
+  getTourCourseList = () => {
+    const { tourCourse } = this.props;
+    const { videoList } = tourCourse;
+    const { onVideoItemClick } = this;
+    let isShowLine = true;
+    if (videoList.length === 0) {
+      return;
+    }
+    return videoList.map((item, index) => {
+      const key = `list${index}`;
+      if (index === videoList.length - 1) {
+        isShowLine = false;
+      }
+      return (
+        <div
+          key={key}
+          onClick={() => {
+            onVideoItemClick({ ...item });
+          }}
+        >
+          <div>
+            <div className={styles.deviceNameLayout}>
+              <div className={styles.deviceName}>{item.deviceName}</div>
+              <div className={styles.goLayout}>
+                <img className={styles.go} src={go} alt="" />
+              </div>
+
+              {isShowLine && <div className={styles.line} />}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  };
+
+  // 加载更多函数
+  loadMore = () => {
+    console.log('上拉加载', '上拉加载');
+    const { dispatch, tourCourse } = this.props;
+    const { pageCount, page } = tourCourse;
+    console.log(pageCount, pageCount);
+    console.log(page, page);
+    if (page < pageCount) {
+      dispatch({
+        type: 'tourCourse/changeState',
+        payload: {
+          page: page + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'tourCourse/getVideoList',
+      });
+    }
+  };
+
+  /**
+   * 搜索事件
+   */
+  search = value => {
+    Toast.info(value, 2);
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        videoList: [],
+        page: 1,
+        pageSize: 10,
+        search: value,
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'tourCourse/getVideoList',
+    });
+  };
+
+  onChange = val => {
+    if (val === '' || val === undefined) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'tourCourse/changeState',
+        payload: {
+          videoList: [],
+          page: 1,
+          pageSize: 10,
+          search: '',
+          loading: true,
+        },
+      });
+
+      dispatch({
+        type: 'tourCourse/getVideoList',
+      });
+    }
+  };
+
+  render() {
+    const { tourCourse } = this.props;
+    const { loading, page, pageCount } = tourCourse;
+    const hasMore = pageCount > page;
+    const { loadMore } = this;
+    return (
+      <div>
+        <NavBar
+          mode="light"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={this.back}
+          rightContent={[
+            <Icon key="0" type="plus" style={{ marginRight: '5%' }} onClick={this.goToListPage} />,
+            <span key="1">添加</span>,
+          ]}
+        >
+          巡课
+        </NavBar>
+        {/* <SearchBar
+          placeholder="班级名称"
+          onSubmit={val => this.search(val)}
+          onChange={val => this.onChange(val)}
+        /> */}
+        <InfiniteScroll
+          initialLoad={false}
+          pageStart={0}
+          hasMore={hasMore && loading}
+          loadMore={loadMore}
+        >
+          <WingBlank size="lg">
+            <div className={styles.deviceListLayout}>{this.getTourCourseList()}</div>
+          </WingBlank>
+        </InfiniteScroll>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ tourCourse }) {
+  return {
+    tourCourse,
+  };
+}
+
+export default connect(mapStateToProps)(BasicLayout);

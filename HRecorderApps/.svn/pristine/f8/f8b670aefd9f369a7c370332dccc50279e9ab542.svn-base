@@ -1,0 +1,73 @@
+.title {
+    text-align: center;
+    margin: 4%;
+    font-size: 16px;
+}
+
+.mark {
+    display: inline-block;
+    color: #f00;
+    margin: 4%;
+}
+
+.timeSelect {
+    text-align: center;
+    margin: 3%;
+    .date {
+        display: inline-block;
+        margin: 0 10%;
+        font-size: 16px;
+        line-height: 2;
+    }
+}
+
+.stepBar {
+    width: 92%;
+    height: 100%;
+    margin: 4%;
+}
+
+.stepIcon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid #2798fc;
+}
+
+:global(.am-steps-item-content) {
+    width: 92%;
+}
+
+:global(.am-steps-vertical .am-steps-item-description) {
+   padding-bottom: 0px;
+}
+
+.description {
+    width: 100%;
+    background-color: #c8c8c8;
+    color: #333;
+    text-align: center;
+    font-size: 16px;
+}
+
+.descriptionOrder {
+    width: 100%;
+    background-color: #2798fc;
+    color: #fff;
+    text-align: center;
+    font-size: 16px;
+}
+
+
+.btns {
+    width: 100%;
+
+    :global(.am-button) {
+        float: left;
+        width: 92%;
+        text-align: center;
+        margin: 0 4%;
+        background-color: #2798fc;
+        color: #fff;
+    }
+}

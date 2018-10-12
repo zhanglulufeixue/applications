@@ -1,0 +1,10 @@
+
+function BasicLayout(props) {
+    return (
+      <div>
+        统计
+      </div>
+    );
+  }
+  
+  export default BasicLayout;

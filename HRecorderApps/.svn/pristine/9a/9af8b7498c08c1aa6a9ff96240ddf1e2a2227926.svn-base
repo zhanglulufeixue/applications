@@ -1,0 +1,265 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-05 13:42:41
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-10-09 14:30:57
+ */
+import React, { PureComponent } from 'react';
+import styles from './Details.less';
+import { connect } from 'dva';
+import ShareModal from '../../components/ShareModal';
+import { Toast, Icon } from 'antd-mobile';
+import router from 'umi/router';
+import noData from '../../assets/no-data.png';
+import InfiniteScroll from 'react-infinite-scroller';
+
+let player = null;
+class VideoDetails extends PureComponent {
+  state = {
+    isShare: false,
+    isShowIntroduce: false,
+  };
+
+  componentDidMount() {
+    const fileID = '5285890782010672365';
+    const appID = '1257645122';
+    const options = {
+      fileID: fileID, // 请传入需要播放的视频 filID 必须
+      appID: appID, // 请传入点播账号的 appID 必须
+    };
+    player = window.TCPlayer('video', options);
+    player.on('error', error => {
+      console.log('error++++++++++++++', error);
+    });
+    console.log('componentDidMount', player);
+    player.play();
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        elseVideoList: [],
+        elsePage: 1,
+        elsePageSize: 5,
+        viewCount: 0,
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoPlayer/getElseVideoList',
+    });
+
+    dispatch({
+      type: 'videoPlayer/viewCountAdd',
+    });
+  }
+
+  /**
+   * 加载更多
+   */
+  loadMore = () => {
+    const { dispatch, videoPlayer } = this.props;
+    const { elsePageCount, elsePage } = videoPlayer;
+    if (elsePage < elsePageCount) {
+      dispatch({
+        type: 'videoPlayer/changeState',
+        payload: {
+          elsePage: elsePage + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'videoPlayer/getElseVideoList',
+      });
+    }
+  };
+
+  onElseVideoItemClick = item => {
+    window.scrollTo(0, 0);
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        videoName: item.videoTitle,
+        lookCount: item.viewsCount,
+        src: item.viewPath,
+        id: item.id,
+        viewCount: 0,
+      },
+    });
+    player.loadVideoByID({
+      fileID: '5285890781994477576', // 请传入需要播放的视频 filID 必须
+      appID: '1257645122', // 请传入点播账号的 appID 必须
+    });
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        elseVideoList: [],
+        elsePage: 1,
+        elsePageSize: 5,
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoPlayer/getElseVideoList',
+    });
+
+    dispatch({
+      type: 'videoPlayer/viewCountAdd',
+    });
+  };
+
+  /**
+   * 获取其他视频
+   */
+  getElseVideoList() {
+    const { videoPlayer } = this.props;
+    const { elseVideoList } = videoPlayer;
+    const { onElseVideoItemClick } = this;
+    return elseVideoList.map((item, index) => {
+      const videoSrc = item.thumb;
+      const videoName = item.videoTitle;
+      const content = item.description;
+      const key = `list${index}`;
+      return (
+        <div
+          key={key}
+          className={styles.item}
+          onClick={() => {
+            onElseVideoItemClick({ ...item });
+          }}
+        >
+          <div className={styles.imgLayout}>
+            <img className={styles.videoSrc} src={videoSrc} alt="" />
+          </div>
+          <div className={styles.itemContentLayout}>
+            <span className={styles.videoName}>{videoName}</span>
+            <span className={styles.content}>{content}</span>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  /**
+   * 分享
+   */
+  share = () => {
+    // this.setState({
+    //   isShare: true,
+    // });
+    player.pause();
+    router.push('./ShareVideo');
+  };
+
+  // 取消分享框
+  cancelShareHandler = () => {
+    this.setState({
+      isShare: false,
+    });
+  };
+  back = () => {
+    player.pause();
+    player.dispose();
+    router.push('/Videos');
+  };
+
+  onError = () => {
+    Toast.fail('播放失败！', 2);
+  };
+
+  clickIntroduceHandler = () => {
+    const { isShowIntroduce } = this.state;
+    if (isShowIntroduce) {
+      this.setState({
+        isShowIntroduce: false,
+      });
+    } else {
+      this.setState({
+        isShowIntroduce: true,
+      });
+    }
+  };
+
+  render() {
+    const { videoPlayer } = this.props;
+    const {
+      videoName,
+      elseVideoList,
+      viewCount,
+      loading,
+      elsePage,
+      elsePageCount,
+      uploadTime,
+      description,
+    } = videoPlayer;
+    const hasMore = elsePage < elsePageCount;
+    const { isShare, isShowIntroduce } = this.state;
+    const shareModalProps = {
+      isShare,
+      cancelShareHandler: this.cancelShareHandler,
+    };
+    return (
+      <div>
+        <Icon type="left" size="m" color="#fff" className={styles.back} onClick={this.back} />
+        <video className={styles.video} id="video" />
+        <div className={styles.detailsLayout}>
+          <div className={styles.detail}>
+            <span className={styles.content}>{videoName}</span>
+            <span className={styles.count}>
+              {viewCount}
+              次播放
+            </span>
+            <span className={styles.uploadTime}>{uploadTime}</span>
+          </div>
+          <div className={styles.introduceLayout} onClick={this.clickIntroduceHandler}>
+            <span className={styles.introduceText}>简介</span>
+            <Icon type="right" size="m" className={styles.introduceImg} />
+          </div>
+          <div className={styles.share} onClick={this.share}>
+            <i className="iconfont icon-tubiao212" />
+          </div>
+        </div>
+        {isShowIntroduce ? (
+          <div>
+            <div className={styles.introduce}>简介</div>
+            <span className={styles.introduceContent}>{description}</span>
+          </div>
+        ) : (
+          <div>
+            <div className={styles.line} />
+            <div className={styles.elseVideoLayout}>
+              <span className={styles.autorElseVideoTitle}>作者其他作品</span>
+              {elseVideoList.length === 0 ? (
+                <div className={styles.noDataLayout}>
+                  <img className={styles.noDataImg} src={noData} alt="" />
+                  <div className={styles.noDataContent}>Opps！暂无视频信息</div>
+                </div>
+              ) : (
+                <InfiniteScroll
+                  initialLoad={false}
+                  pageStart={0}
+                  hasMore={loading && hasMore}
+                  loadMore={this.loadMore}
+                >
+                  <div className={styles.elseVideo}>{this.getElseVideoList()}</div>
+                </InfiniteScroll>
+              )}
+            </div>
+            {!hasMore ? <div className={styles.bottomText}>我是有底线的</div> : ''}
+            {isShare && <ShareModal {...shareModalProps} />}
+          </div>
+        )}
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ videoPlayer }) {
+  return {
+    videoPlayer,
+  };
+}
+export default connect(mapStateToProps)(VideoDetails);

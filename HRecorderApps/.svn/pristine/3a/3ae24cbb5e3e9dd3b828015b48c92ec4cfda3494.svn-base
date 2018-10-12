@@ -1,0 +1,36 @@
+import React, { PureComponent } from 'react';
+import { NavBar, Icon, Button } from 'antd-mobile';
+import styles from './scan.css';
+import router from 'umi/router';
+
+class Scan extends PureComponent {
+  //跳转编辑班级名称界面
+  add = () => {
+    router.push('editClassName');
+  };
+  back = () => {
+    router.push('tourCourse');
+  };
+
+  render() {
+    return (
+      <div>
+        <NavBar
+          mode="light"
+          icon={<Icon type="left" onClick={this.back} />}
+          onLeftClick={() => console.log('onLeftClick')}
+          rightContent={[
+            <Icon key="0" type="cross" style={{ marginRight: '16px' }} onClick={this.back} />,
+          ]}
+        >
+          识别二维码
+        </NavBar>
+        <Button type="ghost" onClick={this.add}>
+          扫码成功
+        </Button>
+      </div>
+    );
+  }
+}
+
+export default Scan;

@@ -1,0 +1,132 @@
+.totleDataLayout {
+  width: 100%;
+  margin-top: 3vw;
+  margin-bottom: 3vw;
+  background-color: #ffffff;
+
+  .totleDataLayoutItem {
+    width: 100%;
+    height: 30vw;
+    margin-top: 2vw;
+    line-height: 30vw;
+
+    .totleNumImg {
+      width: 15vw;
+      height: 15vw;
+      float: left;
+      margin-top: 6.5vw;
+      margin-left: 8vw;
+    }
+
+    .totleNumContent {
+      float: left;
+      margin-left: 4vw;
+      font-size: 4vw;
+    }
+    .totleCiNum {
+      float: left;
+      margin-left: 4vw;
+      font-size: 7vw;
+      color: blue; 
+    }
+    .totleRenNum {
+      float: left;
+      margin-left: 4vw;
+      font-size: 7vw;
+      color: chocolate; 
+    }
+    .ci {
+      float: left;
+      margin-left: 4vw;
+      font-size: 4vw;
+    }
+  }
+}
+
+.list{
+  height: 100%;
+  .card {
+      background-color: #ffffff;
+      padding-top: 3vw;
+    }
+  .listTitle {
+    font-size: 4vw;
+    margin-left: 2vw;
+  }
+
+  .listLayout {
+    margin-top: 3vw;
+
+    .listItem {
+      height: 40px;
+      line-height: 40px;
+      font-size: 4vw;
+      margin-top: 4vw;
+
+      .orderNumberOne {
+        margin-top: 10px;
+        float: left;
+        height: 5vw;
+        width: 5vw;
+        background-color:red;
+        border-radius:50%;
+        text-align: center;
+        line-height: 5vw;
+        margin-left: 4vh;
+      }
+      .orderNumberTwo {
+        margin-top: 10px;
+        float: left;
+        height: 5vw;
+        width: 5vw;
+        background-color:orange;
+        border-radius:50%;
+        text-align: center;
+        line-height: 5vw;
+        margin-left: 4vh;
+        color:#ffffff;
+      }
+
+      .orderNumberThree {
+        margin-top: 10px;
+        float: left;
+        height: 5vw;
+        width: 5vw;
+        background-color:yellow;
+        border-radius:50%;
+        text-align: center;
+        line-height: 5vw;
+        margin-left: 4vh;
+        color:#ffffff;
+      }
+
+      .orderNumberFour {
+        margin-top: 10px;
+        float: left;
+        height: 5vw;
+        width: 5vw;
+        background-color: aqua;
+        border-radius:50%;
+        text-align: center;
+        line-height: 5vw;
+        margin-left: 4vh;
+        color:#ffffff;
+      }
+
+      .name {
+        float: left;
+        height: 20%;
+        margin-left: 20px;
+        margin-left: 4vh;
+      }
+
+      .num {
+        float: right;
+        height: 20%;
+        margin-right: 4vh;
+      }
+    }
+  }
+}
+
+

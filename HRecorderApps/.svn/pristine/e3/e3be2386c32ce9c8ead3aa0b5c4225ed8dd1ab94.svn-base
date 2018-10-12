@@ -1,0 +1,108 @@
+.bg {
+  width: 100%;
+  height: 100%;
+}
+
+.video {
+  width: 100%;
+  height: 40%;
+}
+.detailsLayout {
+  width: 100%;
+  height: 6%;
+
+  .detail{
+    width: 90%;
+    height: 100%;
+    float: left;
+
+    .content {
+      float: left;
+      width: 100%;
+      margin-left: 1%;
+      margin-top: 2%;
+      font-size: 16px;
+      color: black;
+    }
+
+    .count {
+      float: left;
+      width: 100%;
+      margin-top: 2%;
+      margin-left: 1%;
+      font-size: 12px;
+      color: darkgrey;
+    }
+  }
+  .share {
+    margin-top: 10px;
+    width: 5%;
+    height: 5%;
+}
+}
+
+
+.line {
+  width: 100%;
+  height: 0.1%;
+  background-color: darkgrey;
+  margin-top: 5.5%;
+  margin-bottom: 4%;
+}
+.elseVideoLayout {
+  margin-left: 1%;
+  width:100%;
+  height: 52.9%;
+
+  .elseVideo {
+    width:100%;
+    height: 100%;
+    float: left;
+  }
+}
+
+.item {
+  width:100%;
+  height: 22.87%;
+  margin-top: 2%;
+
+  .imgLayout {
+    width: 33%;
+    height: 100%;
+    float: left;
+    margin-right: 5px;
+
+    .img {
+    width: 100%;
+    height: 100%;
+    }
+  }
+
+  .itemContentLayout{
+    margin-left: 1%;
+    width:64.6%;
+    height: 100%;
+    float: left;
+
+    .videoName {
+      width:100%;
+      float: left;
+      font-size: 16px;
+    }
+
+    .content {
+      width:100%;
+      float: left;
+      font-size: 16px;
+      color: darkgray;
+      margin-top: 2%;
+    }
+  }
+}
+
+.back {
+  position: fixed;
+  top: 5%;
+  z-index: 10;
+  margin-left: 5px;
+}

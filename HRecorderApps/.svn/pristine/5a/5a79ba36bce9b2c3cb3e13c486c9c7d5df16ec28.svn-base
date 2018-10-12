@@ -1,0 +1,427 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-04 14:45:48
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-10-11 16:51:20
+ */
+
+import React, { PureComponent } from 'react';
+import { SearchBar, NavBar, Icon, Toast, Checkbox } from 'antd-mobile';
+import { connect } from 'dva';
+import router from 'umi/router';
+import InfiniteScroll from 'react-infinite-scroller';
+import styles from './index.less';
+import noData from '../../assets/no-data.png';
+import DocumentTitle from 'react-document-title';
+import remove from 'lodash/remove';
+import defaultImg from '../../assets/bg.jpg';
+
+const CheckBoxItem = Checkbox.CheckboxItem;
+class videoPlayer extends PureComponent {
+  state = {
+    deleteIdsList: [], //要删除的id列表
+    isItemCanClick: true, //每个item是否可以被点击
+    isSelectAll: false,
+  };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        videoList: [],
+      },
+    });
+    dispatch({
+      type: 'videoPlayer/getVideoList',
+      payload: {
+        page: 1,
+        search: '',
+      },
+    });
+  }
+
+  /**
+   * 加载更多
+   */
+  loadMore = () => {
+    const { dispatch, videoPlayer } = this.props;
+    const { pageCount, page } = videoPlayer;
+    if (page < pageCount) {
+      dispatch({
+        type: 'videoPlayer/getVideoList',
+        payload: {
+          page: page + 1,
+          search: '',
+        },
+      });
+    }
+  };
+
+  /**
+   * 搜索事件
+   */
+  search = value => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        videoList: [],
+      },
+    });
+    dispatch({
+      type: 'videoPlayer/getVideoList',
+      payload: {
+        page: 1,
+        search: value,
+      },
+    });
+  };
+
+  /**
+   * 监听搜索框内字的变化
+   */
+  onChange = val => {
+    if (val === '' || val === undefined) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'videoPlayer/changeState',
+        payload: {
+          videoList: [],
+        },
+      });
+      dispatch({
+        type: 'videoPlayer/getVideoList',
+        payload: {
+          page: 1,
+          search: '',
+        },
+      });
+    }
+  };
+
+  /**
+   * 选中条目编辑时调用
+   */
+  edit = item => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        editItem: item,
+      },
+    });
+    router.push('Videos/UploadVideo');
+  };
+
+  /**
+   * 视频列表选中每个item
+   */
+  selectItemClick = (item, clicked) => {
+    if (clicked) {
+      router.push({
+        pathname: '/Videos/Details',
+        query: {
+          videoId: item.videoId,
+        },
+      });
+    } else {
+      const { deleteIdsList } = this.state;
+      const videoId = item.videoId;
+      let idsList = [];
+      idsList = deleteIdsList;
+      const { videoList } = this.props.videoPlayer;
+      if (
+        idsList.some(item => {
+          return item === videoId;
+        })
+      ) {
+        remove(idsList, i => {
+          return i === videoId;
+        });
+      } else {
+        idsList.push(videoId);
+      }
+
+      this.setState({
+        deleteIdsList: idsList,
+        isSelectAll: deleteIdsList.length === videoList.length ? true : false,
+      });
+      this.forceUpdate();
+    }
+  };
+
+  /**
+   * 点击全选
+   */
+  selectAll = () => {
+    const { videoList } = this.props.videoPlayer;
+    let idsList = [];
+    if (videoList && videoList.length > 0) {
+      idsList = videoList.map((item, index) => {
+        return item.videoId;
+      });
+      this.setState({
+        deleteIdsList: idsList,
+        isSelectAll: true,
+      });
+      this.forceUpdate();
+    }
+  };
+
+  /**
+   * 取消全选
+   */
+  cancelSelectAll = () => {
+    this.setState({
+      deleteIdsList: [],
+      isSelectAll: false,
+    });
+  };
+
+  /**
+   * 点击删除
+   */
+  delete = list => {
+    //调用接口
+    if (list.length > 0) {
+      const ids = list.join(',');
+      const { dispatch } = this.props;
+      const callback = () => {
+        this.setState({
+          isItemCanClick: true,
+        });
+      };
+      dispatch({
+        type: 'videoPlayer/deleteVideo',
+        payload: {
+          callback,
+          ids,
+        },
+      });
+    } else {
+      Toast.info('请选择视频', 1);
+    }
+  };
+
+  /**
+   * 点击管理按钮
+   */
+  manager = isManage => {
+    if (isManage) {
+      const { videoList } = this.props.videoPlayer;
+      if (videoList && videoList.length > 0) {
+        this.setState({
+          isItemCanClick: false,
+        });
+      } else {
+        Toast.info('暂无视频', 1);
+      }
+    } else {
+      this.setState({
+        isItemCanClick: true,
+        deleteIdsList: [],
+      });
+    }
+  };
+
+  /**
+   * 获取视频列表
+   */
+  getVideoList() {
+    const that = this;
+    const { videoList } = this.props.videoPlayer;
+    const { isItemCanClick, deleteIdsList } = this.state;
+    return videoList.map((item, index) => {
+      const key = `list${index}`;
+      return (
+        <div
+          key={key}
+          className={styles.itemLayout}
+          onClick={() => {
+            that.selectItemClick({ ...item }, isItemCanClick);
+          }}
+        >
+          {!isItemCanClick && (
+            <CheckBoxItem
+              checked={deleteIdsList.some(id => {
+                return id === item.videoId;
+              })}
+            />
+          )}
+          <img
+            className={styles.videoSrc}
+            src={item.thumb === '' ? defaultImg : item.thumb}
+            alt=""
+          />
+          <span className={styles.contents}>{item.videoTitle}</span>
+          {!isItemCanClick && (
+            <div
+              className={styles.edit}
+              type="check"
+              onClick={() => {
+                this.edit(item);
+              }}
+            >
+              <i className="iconfont icon-edit1" />
+            </div>
+          )}
+        </div>
+      );
+    });
+  }
+
+  render() {
+    const { loadMore, manager } = this;
+    const { isItemCanClick, deleteIdsList, isSelectAll } = this.state;
+    const { videoPlayer } = this.props;
+    const { page, pageCount, videoList } = videoPlayer;
+    const hasMore = page < pageCount;
+    // 上传点击
+    const uploadClick = () => {
+      const { dispatch } = this.props;
+      window.$('#fileUpload').click();
+      dispatch({
+        type: 'videoPlayer/changeState',
+        payload: {
+          editItem: null,
+        },
+      });
+    };
+
+    // 上传
+    const uploadHandler = () => {
+      const { dispatch } = this.props;
+      const videoObj = document.getElementById('fileUpload');
+      if (videoObj.files.length) {
+        if (videoObj.files[0].size / 1024 / 1024 > 100) {
+          Toast.info('请选择100M以内视频上传');
+          return;
+        }
+        dispatch({
+          type: 'videoPlayer/changeState',
+          payload: {
+            uploadFile: videoObj.files[0],
+          },
+        });
+        router.push('/Videos/UploadVideo');
+      }
+    };
+    return (
+      <DocumentTitle title="录播移动端">
+        <div className={styles.root}>
+          <NavBar
+            mode="light"
+            key="videos"
+            icon={<Icon type="left" size="lg" />}
+            onLeftClick={() => {
+              router.push('/');
+            }}
+            rightContent={
+              <div
+                className={styles.manager}
+                onClick={() => {
+                  manager(isItemCanClick);
+                }}
+              >
+                {isItemCanClick ? '管理' : '取消'}
+              </div>
+            }
+          >
+            视频
+          </NavBar>
+          <div>
+            <SearchBar
+              style={{ width: '80%', float: 'left' }}
+              placeholder="视频名称"
+              onSubmit={val => this.search(val)}
+              onChange={val => this.onChange(val)}
+            />
+            <form>
+              <input
+                type="file"
+                id="fileUpload"
+                name="fileUpload"
+                accept="video/*"
+                required="required"
+                style={{ display: 'none' }}
+                onChange={uploadHandler}
+              />
+            </form>
+
+            <div className={styles.uploadBtn}>
+              <i className="iconfont icon-fenxiang" id="uploadVideoNow" onClick={uploadClick} />
+            </div>
+          </div>
+          {videoList.length === 0 ? (
+            <div className={styles.noDataLayout}>
+              <img className={styles.noDataImg} src={noData} alt="" />
+              <div className={styles.noDataContent}>Opps！暂无视频信息</div>
+            </div>
+          ) : (
+            <div className={styles.list}>
+              <InfiniteScroll
+                style={{
+                  overflow: isItemCanClick ? 'auto' : 'hidden',
+                  marginBottom: isItemCanClick ? '0px' : '15vw',
+                }}
+                initialLoad={false}
+                pageStart={0}
+                loadMore={loadMore}
+                hasMore={hasMore}
+                loader={
+                  <div
+                    key={0}
+                    // className={styles.loader}
+                  >
+                    Loading
+                  </div>
+                }
+              >
+                {this.getVideoList()}
+              </InfiniteScroll>
+              {!isItemCanClick && (
+                <div className={styles.selectAndDeleteLayout}>
+                  <div className={styles.line} />
+                  <div
+                    className={styles.selectAll}
+                    onClick={
+                      isSelectAll && deleteIdsList.length === videoList.length
+                        ? this.cancelSelectAll
+                        : this.selectAll
+                    }
+                  >
+                    {isSelectAll && deleteIdsList.length === videoList.length ? '取消全选' : '全选'}
+                  </div>
+                  <div className={styles.lineVertical} />
+                  <div
+                    className={deleteIdsList.length === 0 ? styles.delete : styles.deleteSelect}
+                    onClick={() => {
+                      this.delete(deleteIdsList);
+                    }}
+                  >
+                    删除
+                  </div>
+                </div>
+              )}
+              {!hasMore && isItemCanClick ? (
+                <div className={styles.bottomText}>我是有底线的</div>
+              ) : (
+                ''
+              )}
+            </div>
+          )}
+        </div>
+      </DocumentTitle>
+    );
+  }
+}
+
+function mapStateToProps({ videoPlayer }) {
+  return {
+    videoPlayer,
+  };
+}
+
+export default connect(mapStateToProps)(videoPlayer);

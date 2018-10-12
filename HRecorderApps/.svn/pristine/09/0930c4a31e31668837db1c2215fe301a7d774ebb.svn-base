@@ -1,0 +1,104 @@
+import React, { PureComponent } from 'react';
+import { createForm } from 'rc-form/lib';
+import { WingBlank, WhiteSpace } from 'antd-mobile';
+import { connect } from 'dva';
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
+import { NavBar, Icon, InputItem, Button, Form } from 'antd-mobile';
+import  './watchVideo.css';
+import router from 'umi/router';
+// import { PureComponent } from '../../../node_modules/@types/react';
+
+class watchVideo extends PureComponent {
+  // function EditClassName(props) {
+  // back = () => {
+  //   router.push('scan');
+  // };
+
+  // 获取镜头列表
+  gettourCourseList = () => {
+    const { tourCourse } = this.props;
+    console.log('tourCourse++', tourCourse);
+    const { tourCourseList } = tourCourse;
+    console.log('tourCourseList', tourCourseList);
+    if (tourCourseList.length === 0) {
+      return;
+    }
+    return tourCourseList.map((item, index) => {
+      return (
+        <div key={item.id}>
+          <WhiteSpace size="md" />
+          <WingBlank size="lg">
+            <div style={{ width: '100%', float: 'left' }}>
+              <img
+                alt=""
+                src={item.videopic}
+                style={{ float: 'left', width: '30%', height: '80px', marginTop: '3%' }}
+              />
+              <div style={{ float: 'left', marginLeft: '4%', marginTop: '3%' }}>{item.type}</div>
+            </div>
+          </WingBlank>
+        </div>
+      );
+    });
+  };
+  render() {
+    return (
+      <div>
+        <NavBar
+          mode="light"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={() => console.log('onLeftClick')}
+          rightContent={[
+            <Icon
+              key="0"
+              type="plus"
+              style={{ marginRight: '16px' }}
+              onClick={this.goToListPage}
+            />,
+            // <span key="1">搜索</span>,
+            // <span key="0">+</span>,
+          ]}
+        >
+          巡课
+        </NavBar>
+        <div style={{ width: '100%', fontSize: '12px' }}>
+          <video
+            id="my-player"
+            preload="auto"
+            width="100%"
+            poster="//vjs.zencdn.net/v/oceans.png"
+            controls="true"
+          >
+            <Icon type="left" size="sm" styles={{ float: 'left', index: '9' }} />
+            <source src="//media.html5media.info/video.mp4" type="video/mp4" />
+            <source src="//vjs.zencdn.net/v/oceans.webm" type="video/webm" />
+            <source src="//media.html5media.info/video.ogv" type="video/ogg" />
+          </video>
+          <div />
+          <div style={{ fontWeight: 'bold' }}>
+            <div style={{ margin: '3%' }}>
+              一年级一班
+              <span style={{ margin: '3%' }}>学生全景</span>
+            </div>
+
+            <div style={{ margin: '3%' }}>郑晓美</div>
+            <div style={{ borderBottom: '1px solid rgb(232,232,232)', width: '100%' }} />
+          </div>
+          <div>
+            <div style={{ marginTop: '3%', marginLeft: '4%', fontWeight: 'bold' }}>其他镜头</div>
+            {this.gettourCourseList()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ tourCourse }) {
+  return {
+    tourCourse,
+  };
+}
+
+export default connect(mapStateToProps)(createForm()(watchVideo));

@@ -1,0 +1,24 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-04 16:22:22
+ * @Description: 描述
+ * @Last Modified by: syy
+ * @Last Modified time: 2018-09-05 09:08:17
+ */
+
+import React, { PureComponent } from 'react';
+import styles from './VideoItem.less';
+import img from '../../../assets/yay.jpg';
+
+export default class VideoItem extends PureComponent {
+  render() {
+    const { onVideoItemClick, contents } = this.props;
+    // console.log('Itemsrc', videoSrc);
+    return (
+      <div className={styles.item} onClick={onVideoItemClick}>
+        <img className={styles.img} src={img} alt="" />
+        <span>{contents}</span>
+      </div>
+    );
+  }
+}

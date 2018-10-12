@@ -1,0 +1,172 @@
+import React, { PureComponent } from 'react';
+import { connect } from 'dva';
+import { SearchBar, Icon, Toast, NavBar } from 'antd-mobile';
+import styles from './liveVideo.less';
+import router from 'umi/router';
+import ShareModal from '../../components/ShareModal.js';
+
+class LiveVideo extends PureComponent {
+
+  state = {
+    
+  };
+
+  // 编辑直播内容
+  editLiveHandler = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        orderOrEdit: '1', 
+      },
+    });
+    router.push('/liveVideo/components/orderModal');
+  };
+
+  // 分享直播内容
+  shareLiveHandler = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        isShare: true, 
+      },
+    });
+  };
+
+
+  // 获取直播列表
+  getLiveVideoList = () => {
+    const { liveVideo } = this.props;
+    const { liveVideoList } = liveVideo;
+    if (liveVideoList.length === 0) {
+      return;
+    }
+    return liveVideoList.map((item, index) => {
+      return (
+        <div key={item.id} className={styles.itemContent}>
+          <span className={styles.itemTitle}>{item.name}</span>
+          <span className={styles.itemState} style={{backgroundColor: `${item.state === '0' ? '#fe2525' : item.state === '1' ? '#2798fc' : '#ccc'}`}}>{item.state === '0' ? '正在直播' : item.state === '1' ? '未开始' : '已结束'}</span>
+          <div className={styles.itemDate}>{item.date}</div>
+          <div>
+          <div className={styles.itemRoom}>{`已绑定教室：${item.room}` }</div>
+          <div className={styles.line}></div>
+          <div className={styles.itemOperateInfo}>
+            {
+              item.state === '0'
+              ? <div>
+                  <div className={styles.itemDeleteDisable}>
+                    <i className='iconfont icon-delete-copy'></i>
+                  </div>
+                  <div className={styles.itemShare} onClick={() => {
+                     this.shareLiveHandler();
+                    }}>
+                    <i className='iconfont icon-tubiao212'></i>
+                  </div>
+                   <div className={styles.itemEditDisable}>
+                    <i className='iconfont icon-edit1-copy'></i>
+                  </div>
+                </div> 
+              : item.state === '1'
+              ? <div>
+                  <div className={styles.itemDelete} onClick={() => {
+                      Toast.info('删除直播');
+                    }}>
+                    <i className='iconfont icon-delete'></i>
+                  </div>
+                  <div className={styles.itemShare} onClick={() => {
+                     this.shareLiveHandler();
+                    }}>
+                    <i className='iconfont icon-tubiao212'></i>
+                  </div>
+                  <div className={styles.itemEdit} type='check' onClick={() => {
+                    Toast.info('修改直播');
+                    this.editLiveHandler();
+                  }}>
+                    <i className='iconfont icon-edit1'></i>
+                  </div>
+                </div> 
+              : <div>
+                  <div className={styles.itemDelete} onClick={() => {
+                      Toast.info('删除直播');
+                    }}>
+                    <i className='iconfont icon-delete'></i>
+                  </div>
+                  <div className={styles.itemShareDisable}>
+                    <i className='iconfont icon-tubiao212-copy'></i>
+                  </div>
+                  <div className={styles.itemEditDisable}>
+                    <i className='iconfont icon-edit1-copy'></i>
+                  </div>
+           </div>
+            }
+          </div>
+          </div>
+        </div>
+      );
+    });
+  }
+
+  // 添加预约加号事件
+  addOrderHandler = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        orderOrEdit: '0', 
+      },
+    });
+    router.push('/liveVideo/components/orderModal');
+  };
+
+  // 取消分享事件
+  cancelShareHandler = () => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'liveVideo/changeState',
+      payload: {
+        isShare: false, 
+      },
+    });
+  };
+
+  render() {
+    const { liveVideo } = this.props;
+    const { isShare} = liveVideo;
+    
+    const shareModalProps = {
+      isShare,
+      cancelShareHandler: this.cancelShareHandler,
+    };
+
+    return (
+      <div className={styles.videoContent}>
+      <NavBar
+          key='liveVideo'
+          mode="light"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={() => {
+            router.push('/');
+          }}
+          rightContent={[
+            <Icon key='liveVideo-add' type="plus" style={{ marginRight: '5%' }} onClick={this.addOrderHandler} />,
+            <span key='liveVideo-add1'>预约</span>,
+          ]}
+        >
+          我的直播
+        </NavBar>
+        <SearchBar placeholder="请输入直播名称"></SearchBar>
+        {this.getLiveVideoList()}
+        {/* <Icon className={styles.plus} type='plus' onClick={this.addOrderHandler}></Icon> */}
+        {isShare && <ShareModal {...shareModalProps}></ShareModal>}
+      </div>
+    );
+  }
+}
+function mapStateToProps({ liveVideo }) {
+  return {
+    liveVideo,
+  };
+}
+
+export default connect(mapStateToProps)(LiveVideo);

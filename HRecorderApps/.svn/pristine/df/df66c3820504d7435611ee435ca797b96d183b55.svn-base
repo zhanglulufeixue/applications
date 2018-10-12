@@ -1,0 +1,548 @@
+/*
+ * @Author: syy
+ * @Date: 2018-09-04 14:45:48
+ * @Description: 描述
+ * @Last Modified by: lulu Zhang
+ * @Last Modified time: 2018-10-09 09:35:23
+ */
+
+import React, { PureComponent } from 'react';
+import { SearchBar, NavBar, Icon, Toast, Checkbox, Button } from 'antd-mobile';
+import { connect } from 'dva';
+import router from 'umi/router';
+import InfiniteScroll from 'react-infinite-scroller';
+import styles from './index.less';
+import noData from '../../assets/no-data.png';
+import editImg from '../../assets/share.png';
+import config from '../../utils/config.js';
+
+const CheckBoxItem = Checkbox.CheckboxItem;
+class videoPlayer extends PureComponent {
+  state = {
+    deleteIdList: [], //要删除的id列表
+    selectedVideoList: [], //选择后的视频列表
+    checked: null,
+    isItemCanClick: true, //每个item是否可以被点击
+    isDeleteBtnRed: false, //删除按钮是否要变成红色
+    isSelectAll: false,
+  };
+
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        videoList: [],
+        page: 1,
+        pageSize: 10,
+        search: '',
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoPlayer/getVideoList',
+    });
+  }
+
+  /**
+   * 视频列表点击事件
+   */
+  onVideoItemClick = item => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        videoName: item.videoTitle,
+        lookCount: item.viewsCount,
+        src: item.viewPath,
+        id: item.id,
+      },
+    });
+    router.push('Videos/Details');
+  };
+
+  /**
+   * 加载更多
+   */
+  loadMore = () => {
+    const { dispatch, videoPlayer } = this.props;
+    const { pageCount, page } = videoPlayer;
+    if (page < pageCount) {
+      dispatch({
+        type: 'videoPlayer/changeState',
+        payload: {
+          page: page + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'videoPlayer/getVideoList',
+      });
+    }
+  };
+
+  /**
+   * 搜索事件
+   */
+  search = value => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'videoPlayer/changeState',
+      payload: {
+        videoList: [],
+        page: 1,
+        pageSize: 10,
+        search: value,
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'videoPlayer/getVideoList',
+    });
+  };
+
+  /**
+   * 监听搜索框内字的变化
+   */
+  onChange = val => {
+    if (val === '' || val === undefined) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'videoPlayer/changeState',
+        payload: {
+          videoList: [],
+          page: 1,
+          pageSize: 10,
+          search: '',
+          loading: true,
+        },
+      });
+
+      dispatch({
+        type: 'videoPlayer/getVideoList',
+      });
+    }
+  };
+
+  /**
+   * 选中条目编辑时调用
+   */
+  edit = item => {
+    const { deleteIdList } = this.state;
+    if (deleteIdList.length > 0) {
+      const { dispatch } = this.props;
+      dispatch({
+        type: 'videoPlayer/changeState',
+        payload: {
+          editItem: item,
+        },
+      });
+      router.push('Videos/UploadVideo');
+    } else {
+      Toast.info('请选择视频', 1);
+    }
+  };
+
+  /**
+   * 点击checkbox每一个item
+   */
+  onCheckboxItemClick = (val, id) => {
+    const { deleteIdList, selectedVideoList } = this.state;
+    const { videoPlayer } = this.props;
+    const { videoList } = videoPlayer;
+    let list = [];  
+    let select = false; //实时的控制删除按钮是否要被置为选中状态
+    //如果是选中
+    if (val) {
+      deleteIdList.push(id);
+      if (videoList && videoList.length > 0) {
+        list = videoList.map((item, index) => {
+          let temp = {};
+          let id = false;
+          for (let i = 0; i < deleteIdList.length; i++) {
+            if (deleteIdList[i] === item.id) {
+              temp = { ...item, checked: '1' };
+              id = true;
+              break;
+            }
+          }
+          return id === true ? temp : item;
+        });
+      }
+    } else {
+      if (deleteIdList.length > 0) {
+        for (let i = 0; i < deleteIdList.length; i++) {
+          if (deleteIdList[i] === id) {
+            deleteIdList.splice(i, 1);
+            break;
+          }
+        }
+        //从选中的列表中去取消选中
+        if (selectedVideoList && selectedVideoList.length > 0) {
+          list = selectedVideoList.map((item, index) => {
+            let temp = {};
+            if (id === item.id) {
+              temp = { ...item, checked: '0' };
+            }
+            return id === item.id ? temp : item;
+          });
+        }
+      }
+    }
+    if (deleteIdList.length > 0) {
+      select = true;
+    } else {
+      select = false;
+    }
+    if (deleteIdList.length === list.length) {
+      this.setState({
+        isSelectAll: true,
+      });
+    } else {
+      this.setState({
+        isSelectAll: false,
+      });
+    }
+    this.setState({
+      deleteIdList: deleteIdList,
+      isDeleteBtnRed: select,
+      selectedVideoList: list,
+    });
+  };
+
+  /**
+   * 点击全选
+   */
+  selectAll = () => {
+    const { videoPlayer } = this.props;
+    const { videoList } = videoPlayer;
+    let idList = [];
+    let list = [];
+    if (videoList && videoList.length > 0) {
+      videoList.map((item, index) => {
+        idList.push(item.id);
+        list.push({
+          ...item,
+          checked: '1',
+        });
+        return list;
+      });
+    }
+    this.setState({
+      deleteIdList: idList,
+      isDeleteBtnRed: true,
+      selectedVideoList: list,
+      isSelectAll: true,
+    });
+  };
+
+  /**
+   * 取消全选
+   */
+  cancelSelectAll = () => {
+    const { videoPlayer } = this.props;
+    const { videoList } = videoPlayer;
+    let idList = [];
+    let list = [];
+    if (videoList && videoList.length > 0) {
+      videoList.map((item, index) => {
+        idList.push(item.id);
+        list.push({
+          ...item,
+          checked: '0',
+        });
+        return list;
+      });
+    }
+    this.setState({
+      deleteIdList: [],
+      isDeleteBtnRed: false,
+      selectedVideoList: list,
+      isSelectAll: false,
+    });
+  };
+
+  /**
+   * 点击删除
+   */
+  delete = list => {
+    //调用接口
+    if (list.length > 0) {
+      console.log('点击删除调用接口', list);
+      Toast.info('删除选中列表', 1);
+    } else {
+      Toast.info('请选择视频列表', 1);
+    }
+  };
+
+  /**
+   * 点击上传按钮
+   */
+  uploadHandler = () => {
+    router.push('/videoPlayer/UploadVideo');
+  };
+
+  /**
+   * 点击管理按钮
+   */
+  manager = () => {
+    this.setState({
+      isItemCanClick: false,
+    });
+  };
+
+  /**
+   * 点击取消按钮
+   */
+  cancle = () => {
+    this.setState({
+      isItemCanClick: true,
+      deleteIdList: [],
+      isDeleteBtnRed: false,
+      selectedVideoList: [],
+    });
+    Toast.info('取消管理', 1);
+  };
+
+  /**
+   * 获取视频列表
+   */
+  getVideoList() {
+    const { videoPlayer } = this.props;
+    const { videoList } = videoPlayer;
+    const { onVideoItemClick } = this;
+    const { isItemCanClick, selectedVideoList } = this.state;
+    return videoList.map((item, index) => {
+      let myChecked = '0';
+      if (selectedVideoList.length > 0) {
+        for (let i = 0; i < selectedVideoList.length; i++) {
+          if (selectedVideoList[i].id === item.id) {
+            myChecked = selectedVideoList[i].checked;
+            break;
+          }
+        }
+      }
+      const videoSrc = item.thumb;
+      const contents = item.videoTitle;
+      const id = item.id;
+      const key = `list${index}`;
+      return isItemCanClick ? (
+        <div
+          key={key}
+          className={styles.itemLayout}
+          onClick={() => {
+            onVideoItemClick({ ...item });
+          }}
+        >
+          <img className={styles.videoSrc} src={videoSrc} alt="" />
+          <span className={styles.contents}>{contents}</span>
+        </div>
+      ) : (
+        <div key={key} className={styles.itemLayout}>
+          <div>
+            <CheckBoxItem
+              id={id}
+              checked={myChecked === '0' ? false : true}
+              onChange={val => {
+                this.onCheckboxItemClick(val.target.checked, id);
+              }}
+            />
+            <img className={styles.videoSrc} src={videoSrc} alt="" />
+            <span className={styles.contents}>{contents}</span>
+            <img
+              className={styles.edit}
+              src={editImg}
+              alt=""
+              onClick={() => {
+                this.edit(item);
+              }}
+            />
+          </div>
+        </div>
+      );
+    });
+  }
+
+  getSignature = function(callback){
+    window.$.ajax({
+        url: `http://${config.service.ipSign}:${config.service.port}/frontend/service/video/get-web-signature`,  //获取客户端上传签名的 URL
+        type: 'POST',
+        dataType: 'json',
+        success: function(result){//result 是派发签名服务器的回包
+            //假设回包为 { "code": 0, "signature": "xxxx"  }
+            //将签名传入 callback，SDK 则能获取这个上传签名，用于后续的上传视频步骤。
+            callback(result.result);
+        },
+        error: function(result) {
+          console.log('getSignatureerror',result);
+        },
+    });
+  };
+  
+  render() {
+    const that = this;
+    const { loadMore, manager, cancle } = this;
+    const {
+      isItemCanClick,
+      isDeleteBtnRed,
+      deleteIdList,
+      isSelectAll,
+      selectedVideoList,
+    } = this.state;
+    const { videoPlayer } = this.props;
+    const { loading, page, pageCount, videoList, search } = videoPlayer;
+    const hasMore = page < pageCount;
+
+    // 上传点击
+    const uploadClick = () => {
+      window.$('#fileUpload').click();
+    };
+
+    // 上传
+    const uploadHandler = () => {
+      const videoObj = document.getElementById("fileUpload");
+      if(videoObj.files.length) {
+        console.dir(window)
+        console.log(videoObj.files);
+        window.qcVideo.ugcUploader.start({
+          videoFile: videoObj.files[0],
+          // allowAudio: 1,
+          // isTranscode: 1,
+          getSignature: that.getSignature,
+          success: function (result) {
+            console.log('success', result);
+            alert('上传成功');
+          },
+          error: function (result) {
+            console.log('error', result);
+            alert('上传失败的原因：' + result.msg);
+          },
+          progress: function (result) {
+            console.log('progress', result);
+            // alert('上传进度');
+            window.$("#progressId").text(Math.floor(result.curr*100)+'%');
+          },
+          finish: function (result) {
+            console.log('finish', result);
+            alert('上传结束');
+              if (!result) {
+                  return false;
+              }
+              
+          }
+      });
+      }
+    };
+
+    return (
+      <div className={styles.root}>
+        <NavBar
+          mode="light"
+          key="videos"
+          icon={<Icon type="left" size="lg" />}
+          onLeftClick={() => {
+            router.push('/');
+          }}
+          rightContent={
+            isItemCanClick ? (
+              <div style={{ marginRight: '5%' }} onClick={manager}>
+                管理
+              </div>
+            ) : (
+              <div style={{ marginRight: '5%' }} onClick={cancle}>
+                取消
+              </div>
+            )
+          }
+        >
+          视频
+        </NavBar>
+        <div>
+          <SearchBar
+            style={{ width: '65%', float: 'left' }}
+            placeholder="视频名称"
+            onSubmit={val => this.search(val)}
+            onChange={val => this.onChange(val)}
+          />
+          <form>
+            <input type='file' id="fileUpload" name="fileUpload" accept="video/*" required="required" style={{display:'none'}} onChange={uploadHandler}></input>
+          </form>
+
+          <div className={styles.uploadBtn}>
+            <span id="uploadVideoNow" onClick={uploadClick}>直接上传视频</span>
+          </div>
+        </div>
+        <div style={{ clear: 'both', textAlign: 'right', marginRight: '5%' }}>
+          <span>上传进度：</span>
+          <span id='progressId'></span>
+        </div>
+        {videoList.length === 0 ? (
+          <div className={styles.noDataLayout}>
+            <img className={styles.noDataImg} src={noData} alt="" />
+            <div className={styles.noDataContent}>Opps！暂无视频信息</div>
+          </div>
+        ) : (<div className={styles.list}>
+              <InfiniteScroll
+                style={{overflow: isItemCanClick ? 'auto' : 'hidden', marginBottom: isItemCanClick ? '0px' : '15vw'}}
+                initialLoad={false}
+                pageStart={0}
+                loadMore={loadMore}
+                hasMore={loading && hasMore}
+                loader={
+                  <div key={0} className="loader">
+                    Loading...
+                  </div>
+                }
+              >
+                {this.getVideoList()}
+              </InfiniteScroll>
+            </div>)
+        }
+        {!isItemCanClick && (
+          <div className={styles.selectAndDeleteLayout}>
+            <div className={styles.line} />
+            {isSelectAll && selectedVideoList.length === videoList.length ? (
+              <div className={styles.selectAll} onClick={this.cancelSelectAll}>
+                取消全选
+              </div>
+            ) : (
+              <div className={styles.selectAll} onClick={this.selectAll}>
+                全选
+              </div>
+            )}
+            <div className={styles.lineVertical} />
+            {!isDeleteBtnRed ? (
+              <div
+                className={styles.delete}
+                onClick={() => {
+                  this.delete(deleteIdList);
+                }}
+              >
+                删除
+              </div>
+            ) : (
+              <div
+                className={styles.deleteSelect}
+                onClick={() => {
+                  this.delete(deleteIdList);
+                }}
+              >
+                删除
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ videoPlayer }) {
+  return {
+    videoPlayer,
+  };
+}
+
+export default connect(mapStateToProps)(videoPlayer);

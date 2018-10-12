@@ -1,0 +1,118 @@
+.bg {
+  width: 100%;
+  height: 100%;
+}
+
+.video {
+  width: 100%;
+  height: 40%;
+}
+.detailsLayout {
+  width: 100%;
+  height: 10%;
+  margin-left: 4%;
+
+  .detail{
+    width: 85%;
+    height: 100%;
+    float: left;
+
+    .content {
+      float: left;
+      width: 100%;
+      margin-left: 1%;
+      margin-top: 10px;
+      font-size: 18px;
+      color: black;
+    }
+
+    .count {
+      float: left;
+      width: 100%;
+      margin-top: 10px;
+      margin-left: 1%;
+      font-size: 14px;
+      color: darkgrey;
+    }
+  }
+  .share {
+    margin-top: 8px;
+    width: 6%;
+    height: 6%;
+}
+}
+
+.line {
+  width: 100%;
+  height: 1px;
+  background-color: #EBEBEB;
+  margin-top: 17px;
+  margin-bottom: 15px;
+}
+.elseVideoLayout {
+  margin-left: 4%;
+  width:100%;
+  height: 52.9%;
+
+  .elseVideo {
+    width:100%;
+    height: 100%;
+    float: left;
+    // margin-top: 2%;
+  }
+}
+
+.item {
+  width:100%;
+  height: 22.87%;
+  margin-top: 4%;
+
+  .imgLayout {
+    width: 40%;
+    height: 100%;
+    float: left;
+    margin-right: 5px;
+
+    .img {
+    width: 100%;
+    height: 100%;
+    }
+  }
+
+  .itemContentLayout{
+    margin-left: 2%;
+    width:52.6%;
+    height: 100%;
+    float: left;
+
+    .videoName {
+      width:100%;
+      float: left;
+      font-size: 16px;
+    }
+
+    .content {
+      width:100%;
+      float: left;
+      font-size: 16px;
+      color: darkgray;
+      margin-top: 3%;
+      overflow:hidden; /*超出的部分隐藏起来。*/ 
+      white-space:nowrap;/*不显示的地方用省略号...代替*/
+      text-overflow:ellipsis;/* 支持 IE */
+      display:block;
+    }
+  }
+}
+
+.back {
+  position: fixed;
+  top: 5%;
+  z-index: 10;
+  margin-left: 5px;
+}
+
+.autorElseVideoTitle {
+  font-size: 18px;
+
+}

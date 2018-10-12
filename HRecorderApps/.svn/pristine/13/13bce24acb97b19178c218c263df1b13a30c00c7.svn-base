@@ -1,0 +1,168 @@
+import React, { PureComponent } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import { NavBar, Icon, WingBlank, Accordion, List  } from '../../../node_modules/antd-mobile';
+import { connect } from 'dva';
+import styles from './index.less';
+import router from 'umi/router';
+import noData from '../../assets/no-data.png';
+
+class BasicLayout extends PureComponent {
+  componentDidMount() {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        videoList: [],
+        page: 1,
+        pageSize: 10,
+        search: '',
+        loading: true,
+      },
+    });
+
+    dispatch({
+      type: 'tourCourse/getVideoList',
+    });
+  }
+  /**
+   * 视频列表点击事件
+   */
+  onVideoItemClick = item => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        src: item.computer,
+        deviceName: item.deviceName,
+        tourId: item.tourId,
+      },
+    });
+    router.push('TourCourse/Details');
+  };
+
+  //返回按钮
+  back = () => {
+    router.push('/');
+  };
+
+  // 获取巡课列表
+  getTourCourseList = () => {
+    const { tourCourse } = this.props;
+    const { videoList } = tourCourse;
+    const { onVideoItemClick } = this;
+    let isShowLine = true;
+    if (videoList.length === 0) {
+      return;
+    }
+    return videoList.map((item, index) => {
+      const key = `list${index}`;
+      if (index === videoList.length - 1) {
+        isShowLine = false;
+      }
+      return (
+        <div
+          key={key}
+          onClick={() => {
+            onVideoItemClick({ ...item });
+          }}
+        >
+          <div>
+            <div className={styles.deviceNameLayout}>
+              <div className={styles.deviceName}>{item.deviceName}</div>
+              <div className={styles.goLayout}>
+                <Icon type="right" className={styles.go} />
+              </div>
+              {isShowLine && <div className={styles.line} />}
+            </div>
+          </div>
+        </div>
+      );
+    });
+  };
+
+  // 加载更多函数
+  loadMore = () => {
+    const { dispatch, tourCourse } = this.props;
+    const { pageCount, page } = tourCourse;
+    if (page < pageCount) {
+      dispatch({
+        type: 'tourCourse/changeState',
+        payload: {
+          page: page + 1,
+          loading: true,
+        },
+      });
+      dispatch({
+        type: 'tourCourse/getVideoList',
+      });
+    }
+  };
+
+  // 下拉选择学校回调
+  selectSchoolHandler = (key) => {
+    const { dispatch } = this.props;
+    dispatch({
+      type: 'tourCourse/changeState',
+      payload: {
+        selectSchool: key,
+      },
+    });
+  }
+
+  // 获取学校列表
+  getSchoolList = (list, selectSchool) => {
+    let arr = [];
+    arr = list.filter((item) => {
+      return item.id !== selectSchool;
+    });
+    return arr.map((item) => {
+      return <List.Item key={item.id} onClick={() => this.selectSchoolHandler(item.id)}>{item.name}</List.Item>
+    });
+  };
+
+  render() {
+    const { loadMore } = this;
+    const { tourCourse } = this.props;
+    const { loading, page, pageCount, videoList, schoolList, selectSchool } = tourCourse;
+    const hasMore = pageCount > page;
+    const title = schoolList.filter((item) => {return item.id === selectSchool})[0].name;
+    return (
+      <div className={styles.wrapperContent}>
+        <NavBar mode="light" icon={<Icon type="left" size="lg" />} onLeftClick={this.back}>
+          <Accordion >
+            <Accordion.Panel header={title}>
+              <List className="my-list">
+                {this.getSchoolList(schoolList, selectSchool)}
+              </List>
+            </Accordion.Panel>  
+          </Accordion>
+        </NavBar>
+        {videoList.length === 0 ? (
+          <div className={styles.noDataLayout}>
+            <img className={styles.noDataImg} src={noData} alt="" />
+            <div className={styles.noDataContent}>Opps！暂无视频信息</div>
+          </div>
+        ) : (
+          <InfiniteScroll
+            initialLoad={false}
+            pageStart={0}
+            hasMore={hasMore && loading}
+            loadMore={loadMore}
+          >
+            <WingBlank size="lg">
+              <div className={styles.deviceListLayout}>{this.getTourCourseList()}</div>
+            </WingBlank>
+          </InfiniteScroll>
+        )}
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ tourCourse }) {
+  return {
+    tourCourse,
+  };
+}
+
+export default connect(mapStateToProps)(BasicLayout);

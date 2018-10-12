@@ -1,0 +1,22 @@
+import styles from './index.css';
+import Link from 'umi/link';
+
+function BasicLayout(props) {
+  console.log('prop', props);
+  const { dispatch } = props;
+
+  return (
+    <div className={styles.normal}>
+      {/* <h1 className={styles.title}>Yay! Welcome to umi!</h1>
+      { props.children } */}
+      <div className={styles.item} >
+        <Link to="/videoPlayer/videoPlayer">视频</Link>
+      </div>
+      <div className={styles.item}>巡课</div>
+      <div className={styles.item}>直播</div>
+      <div className={styles.item}>统计</div>
+    </div>
+  );
+}
+
+export default BasicLayout;
